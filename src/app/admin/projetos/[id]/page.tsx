@@ -185,26 +185,26 @@ export default function ProjetoFormPage() {
   if (loading) return <div className="p-8 text-moss/40">Carregando...</div>
 
   return (
-    <div className="flex min-h-screen">
-      <aside className="w-64 bg-moss min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row">
+      <aside className="w-full md:w-64 bg-moss md:min-h-screen shrink-0">
         <div className="p-6 border-b border-cream/10">
           <Link href="/admin" className="font-serif text-xl text-cream">Claraboia</Link>
         </div>
-        <nav className="py-6">
+        <nav className="py-3 md:py-6 flex md:block overflow-x-auto md:overflow-visible border-t border-cream/10 md:border-t-0">
           {[
             { href: '/admin', label: 'Dashboard' },
             { href: '/admin/projetos', label: 'Projetos', active: true },
             { href: '/admin/arquitetas', label: 'Arquitetas' },
             { href: '/admin/contatos', label: 'Contatos' },
           ].map((item) => (
-            <Link key={item.href} href={item.href} className={`block px-6 py-3 text-sm ${item.active ? 'bg-gold/20 text-gold' : 'text-cream/60 hover:text-cream'}`}>
+            <Link key={item.href} href={item.href} className={`block whitespace-nowrap px-4 md:px-6 py-3 text-sm ${item.active ? 'bg-gold/20 text-gold' : 'text-cream/60 hover:text-cream'}`}>
               {item.label}
             </Link>
           ))}
         </nav>
       </aside>
 
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 md:p-8">
         <div className="flex items-center gap-4 mb-8">
           <Link href="/admin/projetos" className="text-moss/40 hover:text-moss"><ArrowLeft size={20} /></Link>
           <h2 className="font-serif text-3xl text-moss">{isNew ? 'Novo projeto' : 'Editar projeto'}</h2>
@@ -342,7 +342,7 @@ export default function ProjetoFormPage() {
             </div>
 
             {/* Tipologia + Ano */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Tipologia</label>
                 <select value={form.typology} onChange={(e) => setForm({ ...form, typology: e.target.value })}
@@ -359,7 +359,7 @@ export default function ProjetoFormPage() {
             </div>
 
             {/* Localização + Cliente */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Localização</label>
                 <input type="text" value={form.location} onChange={(e) => setForm({ ...form, location: e.target.value })}
@@ -373,7 +373,7 @@ export default function ProjetoFormPage() {
             </div>
 
             {/* Ficha técnica */}
-            <div className="grid grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div>
                 <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Área (m²)</label>
                 <input type="text" value={form.area_m2} onChange={(e) => setForm({ ...form, area_m2: e.target.value })}
@@ -466,13 +466,13 @@ export default function ProjetoFormPage() {
             {error && <p className="text-rose text-sm">{error}</p>}
 
             {/* Ações */}
-            <div className="flex items-center justify-between pt-4 border-t border-moss/10">
+            <div className="flex flex-wrap items-center justify-between gap-3 pt-4 border-t border-moss/10">
               {!isNew && (
                 <button onClick={handleDelete} className="flex items-center gap-2 text-sm text-rose/70 hover:text-rose transition-colors">
                   <Trash2 size={14} /> Excluir
                 </button>
               )}
-              <div className="flex gap-3 ml-auto">
+              <div className="flex gap-3 ml-0 sm:ml-auto">
                 <Link href="/admin/projetos" className="px-5 py-2.5 border border-moss/20 text-moss text-sm hover:bg-moss/5 transition-colors">
                   Cancelar
                 </Link>

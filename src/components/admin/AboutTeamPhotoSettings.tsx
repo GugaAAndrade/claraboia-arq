@@ -6,9 +6,13 @@ import { ImageUpload } from '@/components/ui/ImageUpload'
 
 interface AboutTeamPhotoSettingsProps {
   initialUrl?: string
+  siteSettingsMissing?: boolean
 }
 
-export function AboutTeamPhotoSettings({ initialUrl = '' }: AboutTeamPhotoSettingsProps) {
+export function AboutTeamPhotoSettings({
+  initialUrl = '',
+  siteSettingsMissing = false,
+}: AboutTeamPhotoSettingsProps) {
   const supabase = createClient()
   const [photoUrl, setPhotoUrl] = useState(initialUrl)
   const [saving, setSaving] = useState(false)
@@ -28,7 +32,15 @@ export function AboutTeamPhotoSettings({ initialUrl = '' }: AboutTeamPhotoSettin
       )
 
     if (upsertError) {
-      setError(upsertError.message)
+      const normalized = upsertError.message.toLowerCase()
+      if (
+        upsertError.code === 'PGRST205' ||
+        normalized.includes("could not find the table 'public.site_settings'")
+      ) {
+        setError('Tabela site_settings nao encontrada no Supabase. Crie a tabela para salvar a foto da equipe.')
+      } else {
+        setError(upsertError.message)
+      }
       setSaving(false)
       return
     }
@@ -44,6 +56,11 @@ export function AboutTeamPhotoSettings({ initialUrl = '' }: AboutTeamPhotoSettin
         <p className="text-sm text-moss/50 mt-1">
           Essa imagem aparece no bloco &quot;Quem somos&quot; em <code>/sobre</code>.
         </p>
+        {siteSettingsMissing && (
+          <p className="text-sm text-rose-700 mt-3">
+            Configuração indisponível: tabela <code>public.site_settings</code> nao encontrada.
+          </p>
+        )}
       </div>
 
       <div className="max-w-md">
@@ -61,7 +78,7 @@ export function AboutTeamPhotoSettings({ initialUrl = '' }: AboutTeamPhotoSettin
         <button
           type="button"
           onClick={handleSave}
-          disabled={saving}
+          disabled={saving || siteSettingsMissing}
           className="px-5 py-2.5 bg-wine text-cream text-sm uppercase tracking-wider hover:bg-rose transition-colors disabled:opacity-60"
         >
           {saving ? 'Salvando...' : 'Salvar foto'}

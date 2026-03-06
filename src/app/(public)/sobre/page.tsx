@@ -11,7 +11,7 @@ export const metadata = {
 
 export default async function SobrePage() {
   const supabase = await createClient()
-  const [{ data: architects }, { data: aboutTeamPhoto }] = await Promise.all([
+  const [{ data: architects }, { data: aboutTeamPhoto, error: aboutTeamPhotoError }] = await Promise.all([
     supabase.from('architects').select('*').order('name'),
     supabase
       .from('site_settings')
@@ -20,7 +20,11 @@ export default async function SobrePage() {
       .maybeSingle(),
   ])
 
-  const aboutTeamPhotoUrl = aboutTeamPhoto?.value_text || ''
+  const siteSettingsMissing =
+    aboutTeamPhotoError?.code === 'PGRST205' ||
+    aboutTeamPhotoError?.message?.toLowerCase().includes("could not find the table 'public.site_settings'") ||
+    false
+  const aboutTeamPhotoUrl = siteSettingsMissing ? '' : (aboutTeamPhoto?.value_text || '')
 
   return (
     <>

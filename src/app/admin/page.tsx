@@ -23,15 +23,15 @@ export default async function AdminDashboardPage() {
   ])
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row">
       {/* Sidebar */}
-      <aside className="w-64 bg-moss min-h-screen flex flex-col">
+      <aside className="w-full md:w-64 bg-moss md:min-h-screen flex flex-col shrink-0">
         <div className="p-6 border-b border-cream/10">
           <h1 className="font-serif text-xl text-cream">Claraboia</h1>
           <p className="text-cream/40 text-xs mt-1">Painel administrativo</p>
         </div>
 
-        <nav className="flex-1 py-6">
+        <nav className="flex-1 py-3 md:py-6 flex md:block overflow-x-auto md:overflow-visible border-t border-cream/10 md:border-t-0">
           {[
             { href: '/admin', icon: LayoutGrid, label: 'Dashboard', active: true },
             { href: '/admin/projetos', icon: LayoutGrid, label: 'Projetos' },
@@ -41,7 +41,7 @@ export default async function AdminDashboardPage() {
             <Link
               key={item.href}
               href={item.href}
-              className={`flex items-center gap-3 px-6 py-3 text-sm transition-colors ${
+              className={`flex items-center gap-3 whitespace-nowrap px-4 md:px-6 py-3 text-sm transition-colors ${
                 item.active ? 'bg-gold/20 text-gold' : 'text-cream/60 hover:text-cream hover:bg-white/5'
               }`}
             >
@@ -66,7 +66,7 @@ export default async function AdminDashboardPage() {
       </aside>
 
       {/* Main */}
-      <main className="flex-1 p-8">
+      <main className="flex-1 p-4 md:p-8">
         <h2 className="font-serif text-3xl text-moss mb-8">Bom dia! 👋</h2>
 
         {/* Stats */}

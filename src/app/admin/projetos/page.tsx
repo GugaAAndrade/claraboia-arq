@@ -52,13 +52,13 @@ export default async function AdminProjetosPage() {
   })
 
   return (
-    <div className="flex min-h-screen">
+    <div className="flex min-h-screen flex-col md:flex-row">
       {/* Sidebar simples */}
-      <aside className="w-64 bg-moss min-h-screen">
+      <aside className="w-full md:w-64 bg-moss md:min-h-screen shrink-0">
         <div className="p-6 border-b border-cream/10">
           <Link href="/admin" className="font-serif text-xl text-cream">Claraboia</Link>
         </div>
-        <nav className="py-6">
+        <nav className="py-3 md:py-6 flex md:block overflow-x-auto md:overflow-visible border-t border-cream/10 md:border-t-0">
           {[
             { href: '/admin', label: 'Dashboard' },
             { href: '/admin/projetos', label: 'Projetos', active: true },
@@ -68,7 +68,7 @@ export default async function AdminProjetosPage() {
             <Link
               key={item.href}
               href={item.href}
-              className={`block px-6 py-3 text-sm ${item.active ? 'bg-gold/20 text-gold' : 'text-cream/60 hover:text-cream'}`}
+              className={`block whitespace-nowrap px-4 md:px-6 py-3 text-sm ${item.active ? 'bg-gold/20 text-gold' : 'text-cream/60 hover:text-cream'}`}
             >
               {item.label}
             </Link>
@@ -76,8 +76,8 @@ export default async function AdminProjetosPage() {
         </nav>
       </aside>
 
-      <main className="flex-1 p-8">
-        <div className="flex items-center justify-between mb-8">
+      <main className="flex-1 p-4 md:p-8">
+        <div className="flex flex-wrap items-center justify-between gap-3 mb-8">
           <h2 className="font-serif text-3xl text-moss">Projetos</h2>
           <Link
             href="/admin/projetos/novo"
@@ -89,6 +89,7 @@ export default async function AdminProjetosPage() {
         </div>
 
         <div className="bg-white border border-moss/10 overflow-hidden">
+          <div className="overflow-x-auto">
           <table className="w-full">
             <thead className="bg-moss/5 border-b border-moss/10">
               <tr>
@@ -126,6 +127,7 @@ export default async function AdminProjetosPage() {
               )}
             </tbody>
           </table>
+          </div>
         </div>
       </main>
     </div>
