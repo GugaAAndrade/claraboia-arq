@@ -1,7 +1,6 @@
 'use client'
 
 import { useState } from 'react'
-import { useRouter } from 'next/navigation'
 import { createClient } from '@/lib/supabase/client'
 import { Eye, EyeOff } from 'lucide-react'
 
@@ -11,22 +10,36 @@ export default function AdminLoginPage() {
   const [showPass, setShowPass] = useState(false)
   const [loading, setLoading] = useState(false)
   const [error, setError] = useState('')
-  const router = useRouter()
 
   const handleLogin = async (e: React.FormEvent) => {
     e.preventDefault()
     setLoading(true)
     setError('')
 
-    const supabase = createClient()
-    const { error: err } = await supabase.auth.signInWithPassword({ email, password })
+    try {
+      const supabase = createClient()
+      const { error: err } = await supabase.auth.signInWithPassword({ email, password })
 
-    if (err) {
-      setError('Email ou senha incorretos.')
+      if (err) {
+        const normalized = err.message.toLowerCase()
+        if (normalized.includes('email not confirmed')) {
+          setError('Email ainda nao confirmado no Supabase Auth.')
+        } else if (normalized.includes('invalid login credentials')) {
+          setError('Email ou senha incorretos.')
+        } else {
+          setError(`Falha no login: ${err.message}`)
+        }
+        setLoading(false)
+        return
+      }
+
+      // Redirecionamento completo evita estado preso quando o cookie de sessao
+      // ainda nao foi refletido no roteamento cliente.
+      window.location.assign('/admin')
+    } catch (err) {
+      const message = err instanceof Error ? err.message : 'Erro inesperado no login.'
+      setError(`Falha no login: ${message}`)
       setLoading(false)
-    } else {
-      router.push('/admin')
-      router.refresh()
     }
   }
 
