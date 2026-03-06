@@ -78,7 +78,7 @@ export default async function HomePage() {
               </p>
             </div>
 
-            <h1 className="font-serif text-[52px] md:text-[86px] lg:text-[112px] text-[#171717] leading-[0.88] tracking-[-0.02em] mb-8">
+            <h1 className="font-[Georgia,'Times_New_Roman',serif] text-[52px] md:text-[86px] lg:text-[112px] text-[#171717] leading-[0.91] md:leading-[0.89] lg:leading-[0.9] tracking-[-0.02em] mb-8 [font-variant-caps:normal] normal-case">
               Linhas precisas.
               <br />
               Espaços com alma.

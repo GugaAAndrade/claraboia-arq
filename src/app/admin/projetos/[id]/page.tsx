@@ -202,6 +202,11 @@ export default function ProjetoFormPage() {
             </Link>
           ))}
         </nav>
+        <div className="px-4 md:px-6 py-4 border-t border-cream/10">
+          <Link href="/" target="_blank" className="text-xs text-cream/60 hover:text-gold tracking-wider uppercase">
+            Ver site público ↗
+          </Link>
+        </div>
       </aside>
 
       <main className="flex-1 p-4 md:p-8">
