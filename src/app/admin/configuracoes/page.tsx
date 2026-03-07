@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { BrandLogo } from '@/components/shared/BrandLogo'
+import { HomeHeroImageSettings } from '@/components/admin/HomeHeroImageSettings'
 import { HomeManifestoPhotosSettings } from '@/components/admin/HomeManifestoPhotosSettings'
 import { AboutTeamPhotoSettings } from '@/components/admin/AboutTeamPhotoSettings'
 import { ProjectsHeroImageSettings } from '@/components/admin/ProjectsHeroImageSettings'
@@ -19,6 +20,7 @@ export default async function AdminConfiguracoesPage() {
     .in('key', [
       'home_manifesto_photo_1_url',
       'home_manifesto_photo_2_url',
+      'home_hero_image_url',
       'about_team_photo_url',
       'about_identity_visual_image_url',
       'projects_hero_image_url',
@@ -63,6 +65,11 @@ export default async function AdminConfiguracoesPage() {
         <HomeManifestoPhotosSettings
           initialPhoto1Url={settingsMap.get('home_manifesto_photo_1_url') || ''}
           initialPhoto2Url={settingsMap.get('home_manifesto_photo_2_url') || ''}
+          siteSettingsMissing={siteSettingsMissing}
+        />
+
+        <HomeHeroImageSettings
+          initialUrl={settingsMap.get('home_hero_image_url') || ''}
           siteSettingsMissing={siteSettingsMissing}
         />
 

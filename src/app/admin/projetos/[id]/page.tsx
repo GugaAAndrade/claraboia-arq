@@ -8,7 +8,6 @@ import { ArrowLeft, Plus, Save, Trash2 } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/ImageUpload'
 import { BrandLogo } from '@/components/shared/BrandLogo'
 
-const TYPOLOGIES = ['Residencial', 'Comercial', 'Interiores', 'Urbanismo', 'Outros']
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -45,23 +44,43 @@ interface ProjectGallerySection {
   images: string[]
 }
 
+interface ProjectDetailField {
+  label: string
+  value: string
+}
+
+interface ProjectActionButton {
+  label: string
+  url: string
+}
+
 interface ProjectContentSettings {
+  custom_typology: string
+  details_title: string
+  technical_title: string
   logo_url: string
   explanation_title: string
   explanation_text: string
   sustainability_title: string
   sustainability_text: string
-  technical_drawings_label: string
+  detail_fields: ProjectDetailField[]
+  technical_fields: ProjectDetailField[]
+  action_buttons: ProjectActionButton[]
   gallery_sections: ProjectGallerySection[]
 }
 
 const defaultContentSettings: ProjectContentSettings = {
+  custom_typology: '',
+  details_title: 'Detalhes',
+  technical_title: 'Ficha técnica',
   logo_url: '',
   explanation_title: 'Explicação do projeto',
   explanation_text: '',
   sustainability_title: 'Sustentabilidade',
   sustainability_text: '',
-  technical_drawings_label: 'Estudos técnicos',
+  detail_fields: [],
+  technical_fields: [],
+  action_buttons: [],
   gallery_sections: [],
 }
 
@@ -136,6 +155,24 @@ export default function ProjetoFormPage() {
                   images: Array.isArray(section?.images) ? section.images : [],
                 }))
                 : [],
+              detail_fields: Array.isArray(parsed.detail_fields)
+                ? parsed.detail_fields.map((field) => ({
+                  label: field?.label || '',
+                  value: field?.value || '',
+                }))
+                : [],
+              technical_fields: Array.isArray(parsed.technical_fields)
+                ? parsed.technical_fields.map((field) => ({
+                  label: field?.label || '',
+                  value: field?.value || '',
+                }))
+                : [],
+              action_buttons: Array.isArray(parsed.action_buttons)
+                ? parsed.action_buttons.map((button) => ({
+                  label: button?.label || '',
+                  url: button?.url || '',
+                }))
+                : [],
             })
           } catch {
             setContentSettings(defaultContentSettings)
@@ -174,7 +211,7 @@ export default function ProjetoFormPage() {
       title: form.title,
       slug: form.slug?.trim() ? slugify(form.slug) : slugify(form.title),
       description: form.description,
-      typology: form.typology || null,
+      typology: null,
       location: form.location || null,
       client_name: null,
       area_m2: form.area_m2 ? Number(form.area_m2.replace(',', '.')) : null,
@@ -235,15 +272,26 @@ export default function ProjetoFormPage() {
         text: section.text.trim(),
         images: section.images.map((url) => url.trim()).filter(Boolean),
       }))
-      .filter((section) => section.name && section.images.length > 0)
+      .filter((section) => section.name || section.text || section.images.length > 0)
 
     const settingsPayload: ProjectContentSettings = {
-      logo_url: contentSettings.logo_url.trim(),
-      explanation_title: contentSettings.explanation_title.trim() || 'Explicação do projeto',
-      explanation_text: contentSettings.explanation_text.trim(),
-      sustainability_title: contentSettings.sustainability_title.trim() || 'Sustentabilidade',
-      sustainability_text: contentSettings.sustainability_text.trim(),
-      technical_drawings_label: contentSettings.technical_drawings_label.trim() || 'Estudos técnicos',
+      custom_typology: (contentSettings.custom_typology || '').trim(),
+      details_title: (contentSettings.details_title || '').trim() || 'Detalhes',
+      technical_title: (contentSettings.technical_title || '').trim() || 'Ficha técnica',
+      logo_url: (contentSettings.logo_url || '').trim(),
+      explanation_title: (contentSettings.explanation_title || '').trim() || 'Explicação do projeto',
+      explanation_text: (contentSettings.explanation_text || '').trim(),
+      sustainability_title: (contentSettings.sustainability_title || '').trim() || 'Sustentabilidade',
+      sustainability_text: (contentSettings.sustainability_text || '').trim(),
+      detail_fields: contentSettings.detail_fields
+        .map((field) => ({ label: field.label.trim(), value: field.value.trim() }))
+        .filter((field) => field.label && field.value),
+      technical_fields: contentSettings.technical_fields
+        .map((field) => ({ label: field.label.trim(), value: field.value.trim() }))
+        .filter((field) => field.label && field.value),
+      action_buttons: contentSettings.action_buttons
+        .map((button) => ({ label: button.label.trim(), url: button.url.trim() }))
+        .filter((button) => button.label && button.url),
       gallery_sections: sanitizedSections,
     }
 
@@ -356,6 +404,40 @@ export default function ProjetoFormPage() {
 
               <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                 <div>
+                  <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Tipologia (texto livre)</label>
+                  <input
+                    type="text"
+                    value={contentSettings.custom_typology}
+                    onChange={(e) => setContentSettings((current) => ({ ...current, custom_typology: e.target.value }))}
+                    className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                    placeholder="Hotel boutique, Casa de praia, Retrofit..."
+                  />
+                </div>
+                <div>
+                  <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Título da sidebar</label>
+                  <input
+                    type="text"
+                    value={contentSettings.details_title}
+                    onChange={(e) => setContentSettings((current) => ({ ...current, details_title: e.target.value }))}
+                    className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                    placeholder="Detalhes"
+                  />
+                </div>
+              </div>
+
+              <div>
+                <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Título da ficha técnica</label>
+                <input
+                  type="text"
+                  value={contentSettings.technical_title}
+                  onChange={(e) => setContentSettings((current) => ({ ...current, technical_title: e.target.value }))}
+                  className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                  placeholder="Ficha técnica"
+                />
+              </div>
+
+              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                <div>
                   <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Título da explicação</label>
                   <input
                     type="text"
@@ -363,16 +445,6 @@ export default function ProjetoFormPage() {
                     onChange={(e) => setContentSettings((current) => ({ ...current, explanation_title: e.target.value }))}
                     className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
                     placeholder="Explicação do projeto"
-                  />
-                </div>
-                <div>
-                  <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Nome da seção de desenhos</label>
-                  <input
-                    type="text"
-                    value={contentSettings.technical_drawings_label}
-                    onChange={(e) => setContentSettings((current) => ({ ...current, technical_drawings_label: e.target.value }))}
-                    className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
-                    placeholder="Estudos técnicos"
                   />
                 </div>
               </div>
@@ -413,32 +485,233 @@ export default function ProjetoFormPage() {
 
               <div className="border-t border-moss/15 pt-5">
                 <div className="flex items-center justify-between mb-3">
+                  <label className="block text-xs tracking-widest uppercase text-moss/50">Detalhes da sidebar (label + valor)</label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setContentSettings((current) => ({
+                        ...current,
+                        detail_fields: [...current.detail_fields, { label: '', value: '' }],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
+                  >
+                    <Plus size={12} /> Adicionar campo
+                  </button>
+                </div>
+
+                {contentSettings.detail_fields.length === 0 ? (
+                  <div className="border border-dashed border-moss/20 p-4 text-sm text-moss/50">
+                    Nenhum campo personalizado.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {contentSettings.detail_fields.map((field, fieldIndex) => (
+                      <div key={fieldIndex} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                        <div>
+                          <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Label</label>
+                          <input
+                            type="text"
+                            value={field.label}
+                            onChange={(e) =>
+                              setContentSettings((current) => {
+                                const next = [...current.detail_fields]
+                                next[fieldIndex] = { ...next[fieldIndex], label: e.target.value }
+                                return { ...current, detail_fields: next }
+                              })
+                            }
+                            className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                            placeholder="Área do terreno"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Valor</label>
+                          <input
+                            type="text"
+                            value={field.value}
+                            onChange={(e) =>
+                              setContentSettings((current) => {
+                                const next = [...current.detail_fields]
+                                next[fieldIndex] = { ...next[fieldIndex], value: e.target.value }
+                                return { ...current, detail_fields: next }
+                              })
+                            }
+                            className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                            placeholder="450 m²"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContentSettings((current) => ({
+                              ...current,
+                              detail_fields: current.detail_fields.filter((_, i) => i !== fieldIndex),
+                            }))
+                          }
+                          className="text-xs text-rose/80 hover:text-rose pb-3"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-moss/15 pt-5">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-xs tracking-widest uppercase text-moss/50">Ficha técnica (label + valor)</label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setContentSettings((current) => ({
+                        ...current,
+                        technical_fields: [...current.technical_fields, { label: '', value: '' }],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
+                  >
+                    <Plus size={12} /> Adicionar campo
+                  </button>
+                </div>
+
+                {contentSettings.technical_fields.length === 0 ? (
+                  <div className="border border-dashed border-moss/20 p-4 text-sm text-moss/50">
+                    Nenhum campo de ficha técnica.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {contentSettings.technical_fields.map((field, fieldIndex) => (
+                      <div key={fieldIndex} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                        <div>
+                          <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Label</label>
+                          <input
+                            type="text"
+                            value={field.label}
+                            onChange={(e) =>
+                              setContentSettings((current) => {
+                                const next = [...current.technical_fields]
+                                next[fieldIndex] = { ...next[fieldIndex], label: e.target.value }
+                                return { ...current, technical_fields: next }
+                              })
+                            }
+                            className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                            placeholder="Status"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Valor</label>
+                          <input
+                            type="text"
+                            value={field.value}
+                            onChange={(e) =>
+                              setContentSettings((current) => {
+                                const next = [...current.technical_fields]
+                                next[fieldIndex] = { ...next[fieldIndex], value: e.target.value }
+                                return { ...current, technical_fields: next }
+                              })
+                            }
+                            className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                            placeholder="Concluído"
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContentSettings((current) => ({
+                              ...current,
+                              technical_fields: current.technical_fields.filter((_, i) => i !== fieldIndex),
+                            }))
+                          }
+                          className="text-xs text-rose/80 hover:text-rose pb-3"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-moss/15 pt-5">
+                <div className="flex items-center justify-between mb-3">
+                  <label className="block text-xs tracking-widest uppercase text-moss/50">Botões externos (título + link)</label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setContentSettings((current) => ({
+                        ...current,
+                        action_buttons: [...current.action_buttons, { label: '', url: '' }],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
+                  >
+                    <Plus size={12} /> Adicionar botão
+                  </button>
+                </div>
+
+                {contentSettings.action_buttons.length === 0 ? (
+                  <div className="border border-dashed border-moss/20 p-4 text-sm text-moss/50">
+                    Nenhum botão cadastrado.
+                  </div>
+                ) : (
+                  <div className="space-y-3">
+                    {contentSettings.action_buttons.map((button, buttonIndex) => (
+                      <div key={buttonIndex} className="grid grid-cols-1 sm:grid-cols-[1fr_1fr_auto] gap-3 items-end">
+                        <div>
+                          <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Título do botão</label>
+                          <input
+                            type="text"
+                            value={button.label}
+                            onChange={(e) =>
+                              setContentSettings((current) => {
+                                const next = [...current.action_buttons]
+                                next[buttonIndex] = { ...next[buttonIndex], label: e.target.value }
+                                return { ...current, action_buttons: next }
+                              })
+                            }
+                            className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                            placeholder="Visitar site"
+                          />
+                        </div>
+                        <div>
+                          <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Link</label>
+                          <input
+                            type="url"
+                            value={button.url}
+                            onChange={(e) =>
+                              setContentSettings((current) => {
+                                const next = [...current.action_buttons]
+                                next[buttonIndex] = { ...next[buttonIndex], url: e.target.value }
+                                return { ...current, action_buttons: next }
+                              })
+                            }
+                            className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                            placeholder="https://..."
+                          />
+                        </div>
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContentSettings((current) => ({
+                              ...current,
+                              action_buttons: current.action_buttons.filter((_, i) => i !== buttonIndex),
+                            }))
+                          }
+                          className="text-xs text-rose/80 hover:text-rose pb-3"
+                        >
+                          Remover
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+
+              <div className="border-t border-moss/15 pt-5">
+                <div className="flex items-center justify-between mb-3">
                   <label className="block text-xs tracking-widest uppercase text-moss/50">Seções personalizadas (texto + imagens)</label>
                   <div className="flex flex-wrap items-center gap-2">
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setContentSettings((current) => ({
-                          ...current,
-                          gallery_sections: [...current.gallery_sections, { name: 'Galeria', text: '', images: [] }],
-                        }))
-                      }
-                      className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
-                    >
-                      <Plus size={12} /> Galeria
-                    </button>
-                    <button
-                      type="button"
-                      onClick={() =>
-                        setContentSettings((current) => ({
-                          ...current,
-                          gallery_sections: [...current.gallery_sections, { name: current.technical_drawings_label || 'Estudos técnicos', text: '', images: [] }],
-                        }))
-                      }
-                      className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
-                    >
-                      <Plus size={12} /> Desenhos
-                    </button>
                     <button
                       type="button"
                       onClick={() =>
@@ -581,128 +854,11 @@ export default function ProjetoFormPage() {
               </div>
             </div>
 
+            {/* Ano */}
             <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-xs tracking-widest uppercase text-moss/50">Galeria do projeto</label>
-                <button
-                  type="button"
-                  onClick={() => setForm((current) => ({ ...current, gallery_images: [...current.gallery_images, ''] }))}
-                  className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
-                >
-                  <Plus size={12} /> Adicionar imagem
-                </button>
-              </div>
-
-              {form.gallery_images.length === 0 ? (
-                <div className="border border-dashed border-moss/20 p-5 text-sm text-moss/50">
-                  Nenhuma imagem na galeria. Clique em "Adicionar imagem" para enviar.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {form.gallery_images.map((url, index) => (
-                    <div key={`${index}-${url.slice(0, 12)}`} className="space-y-2">
-                      <ImageUpload
-                        label={`Imagem ${index + 1}`}
-                        value={url}
-                        onChange={(newUrl) => {
-                          setForm((current) => {
-                            const next = [...current.gallery_images]
-                            next[index] = newUrl
-                            return { ...current, gallery_images: next }
-                          })
-                        }}
-                        bucket="images"
-                        folder="projetos"
-                        aspect={index === 0 ? '16/9' : '4/3'}
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setForm((current) => ({
-                            ...current,
-                            gallery_images: current.gallery_images.filter((_, i) => i !== index),
-                          }))
-                        }}
-                        className="text-xs text-rose/80 hover:text-rose"
-                      >
-                        Remover imagem
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-              <p className="mt-2 text-xs text-moss/45">
-                As imagens enviadas aparecem automaticamente na galeria detalhada do projeto.
-              </p>
-            </div>
-
-            <div>
-              <div className="flex items-center justify-between mb-3">
-                <label className="block text-xs tracking-widest uppercase text-moss/50">Plantas do projeto</label>
-                <button
-                  type="button"
-                  onClick={() => setForm((current) => ({ ...current, floor_plans: [...current.floor_plans, ''] }))}
-                  className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
-                >
-                  <Plus size={12} /> Adicionar planta
-                </button>
-              </div>
-
-              {form.floor_plans.length === 0 ? (
-                <div className="border border-dashed border-moss/20 p-5 text-sm text-moss/50">
-                  Nenhuma planta adicionada ainda.
-                </div>
-              ) : (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                  {form.floor_plans.map((url, index) => (
-                    <div key={`${index}-${url.slice(0, 12)}`} className="space-y-2">
-                      <ImageUpload
-                        label={`Planta ${index + 1}`}
-                        value={url}
-                        onChange={(newUrl) => {
-                          setForm((current) => {
-                            const next = [...current.floor_plans]
-                            next[index] = newUrl
-                            return { ...current, floor_plans: next }
-                          })
-                        }}
-                        bucket="images"
-                        folder="projetos/plantas"
-                        aspect="4/3"
-                      />
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setForm((current) => ({
-                            ...current,
-                            floor_plans: current.floor_plans.filter((_, i) => i !== index),
-                          }))
-                        }}
-                        className="text-xs text-rose/80 hover:text-rose"
-                      >
-                        Remover planta
-                      </button>
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
-
-            {/* Tipologia + Ano */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Tipologia</label>
-                <select value={form.typology} onChange={(e) => setForm({ ...form, typology: e.target.value })}
-                  className="w-full border border-moss/20 px-4 py-3 text-moss bg-white focus:outline-none focus:border-wine">
-                  <option value="">Selecionar</option>
-                  {TYPOLOGIES.map((t) => <option key={t} value={t}>{t}</option>)}
-                </select>
-              </div>
-              <div>
-                <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Ano</label>
-                <input type="number" min="1900" max="2100" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })}
-                  className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine" />
-              </div>
+              <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Ano</label>
+              <input type="number" min="1900" max="2100" value={form.year} onChange={(e) => setForm({ ...form, year: e.target.value })}
+                className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine" />
             </div>
 
             <div>
@@ -711,24 +867,9 @@ export default function ProjetoFormPage() {
                 className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine" placeholder="Aracaju, Sergipe" />
             </div>
 
-            {/* Ficha técnica */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-              <div>
-                <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Área do terreno (m²)</label>
-                <input type="text" value={form.area_m2} onChange={(e) => setForm({ ...form, area_m2: e.target.value })}
-                  className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine" placeholder="125.5" />
-              </div>
-              <div>
-                <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Status da obra</label>
-                <input type="text" value={form.project_status} onChange={(e) => setForm({ ...form, project_status: e.target.value })}
-                  className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine" placeholder="Concluído" />
-              </div>
-            </div>
-            <div>
-              <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Escopo</label>
-              <input type="text" value={form.project_scope} onChange={(e) => setForm({ ...form, project_scope: e.target.value })}
-                className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine" placeholder="Reforma completa de interiores" />
-            </div>
+            <p className="text-xs text-moss/45">
+              Os campos da ficha técnica do site agora são totalmente personalizados no bloco &quot;Ficha técnica personalizada&quot; acima.
+            </p>
             {/* Mapa */}
             <div>
               <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Mapa (URL embed)</label>

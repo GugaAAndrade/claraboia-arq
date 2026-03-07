@@ -1,8 +1,8 @@
-import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { Project } from '@/types'
 import { ArrowUpRight } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 const TYPOLOGIES = ['Todos', 'Residencial', 'Comercial', 'Interiores', 'Urbanismo', 'Outros']
 const slugify = (value: string) =>
@@ -74,19 +74,19 @@ export default async function ProjetosPage({
   return (
     <>
       {/* Hero */}
-      <section className="bg-moss py-20 lg:py-28 px-6 lg:px-12 relative overflow-hidden">
+      <section className="bg-wine py-20 lg:py-28 px-6 lg:px-12 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative">
-          <p className="text-gold text-[10px] tracking-[0.35em] uppercase mb-4">Projetos</p>
+  
           <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-cream leading-[0.96]">
             Projetos
           </h1>
           <p className="text-cream/60 text-sm mt-5 max-w-md leading-relaxed">
-            Espacos desenhados com precisao, atmosfera e identidade.
+            Espaços desenhados com precisão, atmosfera e identidade.
           </p>
         </div>
       </section>
 
-      {/* Filtros — faixa sticky minimalista */}
+      {/* Filtros — faixa sticky minimalista
       <section className="sticky top-[72px] z-40 bg-[#FAF5EA]/95 backdrop-blur-md border-y border-wine/10 py-5 px-6 lg:px-14">
         <div className="max-w-7xl mx-auto flex flex-wrap gap-2 items-center">
           <span className="font-sans text-[9px] tracking-[0.4em] uppercase text-moss/45 mr-3">Filtrar</span>
@@ -124,7 +124,7 @@ export default async function ProjetosPage({
             </>
           )}
         </div>
-      </section>
+      </section> */}
 
       {/* Grid de projetos */}
       <section className="py-16 px-6 lg:px-14 bg-[#FAF5EA] min-h-[60vh]">

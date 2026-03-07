@@ -1,8 +1,8 @@
 'use client'
 
-import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
-import { Send, CheckCircle, MapPin, Mail, Instagram } from 'lucide-react'
+import { CheckCircle, Instagram, Mail, MapPin, Send } from 'lucide-react'
+import { useState } from 'react'
 
 export default function ContatoPage() {
   const [form, setForm] = useState({ name: '', email: '', phone: '', message: '' })
@@ -28,9 +28,9 @@ export default function ContatoPage() {
   return (
     <>
       {/* Hero */}
-      <section className="bg-moss py-20 lg:py-28 px-6 lg:px-12 relative overflow-hidden">
+      <section className="bg-wine py-20 lg:py-28 px-6 lg:px-12 relative overflow-hidden">
         <div className="max-w-7xl mx-auto relative">
-          <p className="text-gold text-[10px] tracking-[0.35em] uppercase mb-4">Contato</p>
+          <p className="text-gold text-[16px] tracking-[0.35em] uppercase mb-4">Contato</p>
           <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-cream leading-[0.96]">
             Vamos conversar
           </h1>
@@ -57,7 +57,7 @@ export default function ContatoPage() {
             <div className="flex flex-col gap-3">
               {/* Email */}
               <a
-                href="mailto:contato@clarabolaarquitetura.com"
+                href="mailto:estudioclaraboia.arq@gmail.com"
                 className="group flex items-center gap-5 p-6 bg-[#FFFDF8] border border-wine/12 hover:border-wine/35 transition-all duration-300 cursor-pointer"
               >
                 <div className="w-12 h-12 bg-wine flex items-center justify-center text-cream shrink-0">
@@ -66,7 +66,7 @@ export default function ContatoPage() {
                 <div>
                   <p className="font-sans text-[10px] tracking-[0.3em] uppercase font-light text-moss/60 mb-0.5">Email</p>
                   <p className="font-sans text-[12px] font-light text-charcoal group-hover:text-wine transition-colors">
-                    contato@clarabolaarquitetura.com
+                    estudioclaraboia.arq@gmail.com
                   </p>
                 </div>
               </a>
@@ -121,7 +121,6 @@ export default function ContatoPage() {
             ) : (
               <div className="bg-[#FFFDF8] border border-wine/12 p-10 md:p-14">
                 <h3 className="font-serif text-2xl text-charcoal mb-2">Formulario de contato</h3>
-                <p className="font-sans text-[12px] font-light text-moss/65 mb-10">Responderemos em ate 24 horas uteis.</p>
 
                 <form onSubmit={handleSubmit} className="flex flex-col gap-7">
                   <div className="grid grid-cols-1 sm:grid-cols-2 gap-7">

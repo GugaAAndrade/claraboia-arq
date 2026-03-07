@@ -1,8 +1,8 @@
+import { createClient } from '@/lib/supabase/server'
+import { ArrowLeft, UserRound } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
 import { notFound } from 'next/navigation'
-import { createClient } from '@/lib/supabase/server'
-import { MapPin, Calendar, ArrowLeft, Ruler, Home, UserRound } from 'lucide-react'
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -23,13 +23,23 @@ interface ProjectGallerySection {
   images: string[]
 }
 
+interface ProjectDetailField {
+  label: string
+  value: string
+}
+
 interface ProjectContentSettings {
+  custom_typology?: string
+  details_title?: string
+  technical_title?: string
   logo_url?: string
   explanation_title?: string
   explanation_text?: string
   sustainability_title?: string
   sustainability_text?: string
-  technical_drawings_label?: string
+  detail_fields?: ProjectDetailField[]
+  technical_fields?: ProjectDetailField[]
+  action_buttons?: { label?: string; url?: string }[]
   gallery_sections?: ProjectGallerySection[]
 }
 
@@ -130,11 +140,6 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
     }
   }
 
-  const allImages = [
-    ...(project.cover_url ? [project.cover_url] : []),
-    ...(project.images || []).filter((img: string) => img !== project.cover_url),
-  ]
-  const floorPlans = Array.isArray(project.floor_plans) ? project.floor_plans.filter(Boolean) : []
   const customSections = Array.isArray(projectContent.gallery_sections)
     ? projectContent.gallery_sections
       .map((section) => ({
@@ -142,14 +147,41 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
         text: section?.text?.trim() || '',
         images: Array.isArray(section?.images) ? section.images.filter(Boolean) : [],
       }))
-      .filter((section) => section.name && section.images.length > 0)
+      .filter((section) => section.name || section.text || section.images.length > 0)
     : []
-  const technicalDrawingsLabel = projectContent.technical_drawings_label?.trim() || 'Estudos técnicos'
   const explanationTitle = projectContent.explanation_title?.trim() || 'Explicação do projeto'
   const explanationText = projectContent.explanation_text?.trim() || ''
   const sustainabilityTitle = projectContent.sustainability_title?.trim() || 'Sustentabilidade'
   const sustainabilityText = projectContent.sustainability_text?.trim() || ''
+  const customTypology = projectContent.custom_typology?.trim() || ''
+  const detailsTitle = projectContent.details_title?.trim() || 'Detalhes'
+  const technicalTitle = projectContent.technical_title?.trim() || 'Ficha técnica'
   const logoUrl = projectContent.logo_url?.trim() || ''
+  const customDetailFields = Array.isArray(projectContent.detail_fields)
+    ? projectContent.detail_fields
+      .map((field) => ({
+        label: field?.label?.trim() || '',
+        value: field?.value?.trim() || '',
+      }))
+      .filter((field) => field.label && field.value)
+    : []
+  const detailFields = customDetailFields
+  const customTechnicalFields = Array.isArray(projectContent.technical_fields)
+    ? projectContent.technical_fields
+      .map((field) => ({
+        label: field?.label?.trim() || '',
+        value: field?.value?.trim() || '',
+      }))
+      .filter((field) => field.label && field.value)
+    : []
+  const actionButtons = Array.isArray(projectContent.action_buttons)
+    ? projectContent.action_buttons
+      .map((button) => ({
+        label: button?.label?.trim() || '',
+        url: button?.url?.trim() || '',
+      }))
+      .filter((button) => button.label && button.url)
+    : []
 
   const descriptionBlocks = (project.description || '')
     .split(/\n\s*\n/)
@@ -212,16 +244,17 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15" />
         <div className="relative w-full p-6 md:p-12">
           <div className="max-w-7xl mx-auto">
-            <div className="inline-flex flex-col bg-black/45 backdrop-blur-sm border border-white/15 px-6 py-5 md:px-8 md:py-7 min-w-[280px]">
-              <p className="text-gold text-[11px] tracking-[0.35em] uppercase mb-3">{project.typology || 'Projeto'}</p>
+            <div className="inline-flex flex-col bg-transparent border-0 backdrop-blur-0 p-0 min-w-0">
               {logoUrl && (
-                <div className="relative h-12 md:h-16 w-[210px] md:w-[280px] mb-4">
-                  <Image src={logoUrl} alt={`Logomarca de ${project.title}`} fill className="object-contain object-left" />
+                <div className="relative h-[90px] md:h-[140px] w-[280px] md:w-[380px] lg:w-[440px]">
+                  <Image
+                    src={logoUrl}
+                    alt={`Logomarca de ${project.title}`}
+                    fill
+                    className="object-contain object-left drop-shadow-[0_8px_18px_rgba(0,0,0,0.45)]"
+                  />
                 </div>
               )}
-              <h1 className="font-serif text-4xl md:text-6xl !text-white leading-[0.95] [text-shadow:0_3px_22px_rgba(0,0,0,0.55)]">
-                {project.title}
-              </h1>
             </div>
           </div>
         </div>
@@ -263,75 +296,51 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
               </div>
             )}
 
-            {customSections.length > 0 ? (
+            {actionButtons.length > 0 && (
+              <div className="mb-14 flex flex-wrap gap-3">
+                {actionButtons.map((button, index) => (
+                  <a
+                    key={`${button.label}-${index}`}
+                    href={button.url}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center px-6 py-3 bg-wine text-cream text-[11px] tracking-[0.22em] uppercase hover:bg-moss transition-colors"
+                  >
+                    {button.label}
+                  </a>
+                ))}
+              </div>
+            )}
+
+            {customSections.length > 0 && (
               <div className="space-y-14">
                 {customSections.map((section, sectionIndex) => (
                   <div key={`${section.name}-${sectionIndex}`}>
-                    <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{section.name}</p>
+                    {section.name && (
+                      <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{section.name}</p>
+                    )}
                     {section.text && (
                       <p className="text-moss/70 text-[15px] leading-[1.85] mb-5">{section.text}</p>
                     )}
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {section.images.map((url, imageIndex) => (
-                        <div key={url + imageIndex} className={`overflow-hidden bg-stone-100 ${imageIndex === 0 ? 'sm:col-span-2' : ''}`}>
-                          <div className={`relative ${imageIndex === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
-                            <Image
-                              src={url}
-                              alt={`${project.title} — ${section.name} ${imageIndex + 1}`}
-                              fill
-                              className="object-cover hover:scale-105 transition-transform duration-700"
-                            />
+                    {section.images.length > 0 && (
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                        {section.images.map((url, imageIndex) => (
+                          <div key={url + imageIndex} className={`overflow-hidden bg-stone-100 ${imageIndex === 0 ? 'sm:col-span-2' : ''}`}>
+                            <div className={`relative ${imageIndex === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
+                              <Image
+                                src={url}
+                                alt={`${project.title} — ${section.name || 'seção'} ${imageIndex + 1}`}
+                                fill
+                                className="object-cover hover:scale-105 transition-transform duration-700"
+                              />
+                            </div>
                           </div>
-                        </div>
-                      ))}
-                    </div>
+                        ))}
+                      </div>
+                    )}
                   </div>
                 ))}
               </div>
-            ) : (
-              <>
-                {/* Galeria */}
-                {allImages.length > 0 && (
-                  <div>
-                    <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">Galeria do projeto</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {allImages.map((url: string, i: number) => (
-                        <div key={i} className={`overflow-hidden bg-stone-100 ${i === 0 ? 'sm:col-span-2' : ''}`}>
-                          <div className={`relative ${i === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
-                            <Image
-                              src={url}
-                              alt={`${project.title} — imagem ${i + 1}`}
-                              fill
-                              className="object-cover hover:scale-105 transition-transform duration-700"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-
-                {/* Desenhos técnicos */}
-                {floorPlans.length > 0 && (
-                  <div className="mt-14">
-                    <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{technicalDrawingsLabel}</p>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                      {floorPlans.map((url: string, i: number) => (
-                        <div key={i} className="overflow-hidden bg-stone-100 border border-stone-200">
-                          <div className="relative aspect-[4/3]">
-                            <Image
-                              src={url}
-                              alt={`${project.title} — desenho ${i + 1}`}
-                              fill
-                              className="object-contain bg-white"
-                            />
-                          </div>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
-                )}
-              </>
             )}
 
             {/* Mapa */}
@@ -356,56 +365,47 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
           {/* Sidebar info */}
           <div className="lg:col-span-1">
             <div className="bg-moss/5 p-8 sticky top-[90px]">
-              <h3 className="font-serif text-xl text-moss mb-6">Detalhes</h3>
+              <h3 className="font-serif text-xl text-moss mb-6">{detailsTitle}</h3>
 
-              <div className="flex flex-col gap-4 mb-8">
-                {project.typology && (
-                  <div className="flex items-center gap-2">
-                    <Home size={14} className="text-gold" />
-                    <div>
-                    <p className="text-xs tracking-widest uppercase text-gold mb-1">Tipologia</p>
-                    <p className="text-moss">{project.typology}</p>
-                    </div>
-                  </div>
-                )}
-                {project.year && (
-                  <div className="flex items-center gap-2">
-                    <Calendar size={14} className="text-gold" />
-                    <p className="text-moss">{project.year}</p>
-                  </div>
-                )}
-                {project.location && (
-                  <div className="flex items-center gap-2">
-                    <MapPin size={14} className="text-gold" />
-                    <p className="text-moss">{project.location}</p>
-                  </div>
-                )}
-                <div className="flex items-center gap-2">
-                  <Ruler size={14} className="text-gold" />
-                  <div>
-                    <p className="text-xs tracking-widest uppercase text-gold mb-1">Área do terreno</p>
-                    <p className="text-moss/70 text-sm">{project.area_m2 ? `${project.area_m2} m²` : 'Área não informada'}</p>
+              {detailFields.length > 0 && (
+                <div className="border-t border-gold/20 pt-6 mb-8">
+                  <div className="space-y-3 text-sm">
+                    {detailFields.map((field, index) => (
+                      <div key={`${field.label}-${index}`}>
+                        <p className="text-moss/45 uppercase tracking-wider text-[10px]">{field.label}</p>
+                        <p className="text-moss">{field.value}</p>
+                      </div>
+                    ))}
                   </div>
                 </div>
-              </div>
-
-              {(project.project_scope || project.project_status) && (
+              )}
+              {detailFields.length === 0 && (
                 <div className="border-t border-gold/20 pt-6 mb-8">
-                  <p className="text-xs tracking-widest uppercase text-gold mb-4">Ficha técnica</p>
+                  <p className="text-sm text-moss/60">
+                    Nenhum detalhe cadastrado para este projeto.
+                  </p>
+                </div>
+              )}
+
+              <h3 className="font-serif text-xl text-moss mb-6">{technicalTitle}</h3>
+
+              {customTechnicalFields.length > 0 && (
+                <div className="border-t border-gold/20 pt-6 mb-8">
                   <div className="space-y-3 text-sm">
-                    {project.project_status && (
-                      <div>
-                        <p className="text-moss/45 uppercase tracking-wider text-[10px]">Status</p>
-                        <p className="text-moss">{project.project_status}</p>
+                    {customTechnicalFields.map((field, index) => (
+                      <div key={`${field.label}-${index}`}>
+                        <p className="text-moss/45 uppercase tracking-wider text-[10px]">{field.label}</p>
+                        <p className="text-moss">{field.value}</p>
                       </div>
-                    )}
-                    {project.project_scope && (
-                      <div>
-                        <p className="text-moss/45 uppercase tracking-wider text-[10px]">Escopo</p>
-                        <p className="text-moss">{project.project_scope}</p>
-                      </div>
-                    )}
+                    ))}
                   </div>
+                </div>
+              )}
+              {customTechnicalFields.length === 0 && (
+                <div className="border-t border-gold/20 pt-6 mb-8">
+                  <p className="text-sm text-moss/60">
+                    Nenhum campo de ficha técnica cadastrado.
+                  </p>
                 </div>
               )}
 
@@ -424,15 +424,16 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                     }) => (
                       <div key={architect.id} className="flex items-center gap-3">
                         {architect.photo_url ? (
-                          <Image
-                            src={architect.photo_url}
-                            alt={architect.name}
-                            width={44}
-                            height={44}
-                            className="rounded-full object-cover"
-                          />
+                          <div className="relative w-12 h-12 rounded-full overflow-hidden shrink-0">
+                            <Image
+                              src={architect.photo_url}
+                              alt={architect.name}
+                              fill
+                              className="object-cover"
+                            />
+                          </div>
                         ) : (
-                          <div className="w-11 h-11 rounded-full bg-wine/10 border border-wine/20 flex items-center justify-center font-serif text-wine">
+                          <div className="w-12 h-12 rounded-full bg-wine/10 border border-wine/20 flex items-center justify-center font-serif text-wine shrink-0">
                             {architect.name.charAt(0)}
                           </div>
                         )}

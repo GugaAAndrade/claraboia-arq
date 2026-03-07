@@ -1,8 +1,8 @@
-import Link from 'next/link'
-import Image from 'next/image'
 import { createClient } from '@/lib/supabase/server'
 import { Project } from '@/types'
 import { ArrowRight, ArrowUpRight } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 const slugify = (value: string) =>
   value
     .toLowerCase()
@@ -21,7 +21,7 @@ export default async function HomePage() {
     supabase
       .from('site_settings')
       .select('key, value_text')
-      .in('key', ['home_manifesto_photo_1_url', 'home_manifesto_photo_2_url']),
+      .in('key', ['home_manifesto_photo_1_url', 'home_manifesto_photo_2_url', 'home_hero_image_url']),
   ])
 
   const architectById = new Map((architects || []).map((a) => [a.id as string, a.name as string]))
@@ -70,13 +70,16 @@ export default async function HomePage() {
   const manifestoPhoto2 = siteSettingsMissing
     ? ''
     : (manifestoPhotosMap.get('home_manifesto_photo_2_url') || "https://images.unsplash.com/photo-1600210492493-0946911123ea?w=1200&q=80")
+  const homeHeroImageUrl = siteSettingsMissing
+    ? '/brand/hero-identity.jpg'
+    : (manifestoPhotosMap.get('home_hero_image_url') || '/brand/hero-identity.jpg')
 
   return (
     <>
       {/* ── HERO ────────────────────────────────────────────── */}
       <section className="relative min-h-[760px] px-6 lg:px-14 pb-16 md:pb-20 overflow-hidden bg-moss flex items-end">
         <Image
-          src="/brand/hero-identity.jpg"
+          src={homeHeroImageUrl}
           alt="Claraboia Arquitetura"
           fill
           priority
@@ -103,7 +106,7 @@ export default async function HomePage() {
             </div>
 
             <p className="font-serif text-[22px] md:text-[28px] text-cream leading-[1.25] max-w-md mb-10">
-              Arquitetura autoral com luz, matéria e propósito.
+              Espaços que iluminam o viver. Arquitetura com propósito e consciência.
             </p>
           </div>
 
@@ -118,7 +121,7 @@ export default async function HomePage() {
                   key={title}
                   className="topic-card border border-cream/22 bg-moss/45 backdrop-blur-[2px] p-4 md:p-5 transition-all duration-300 hover:bg-moss/65 hover:border-gold/40 hover:shadow-[0_10px_24px_rgba(0,0,0,0.28)]"
                 >
-                  <p className="font-sans text-[10px] tracking-[0.28em] uppercase text-rose mb-2">{title}</p>
+                  <p className="font-sans text-[10px] font-bold tracking-[0.28em] uppercase text-cream mb-2">{title}</p>
                   <p className="font-sans text-[14px] leading-[1.7] text-cream">{text}</p>
                 </div>
               ))}
@@ -128,7 +131,7 @@ export default async function HomePage() {
       </section>
 
       {/* ── MANIFESTO ────────────────────────────────────────── */}
-      <section className="py-36 px-6 lg:px-14 bg-white">
+      <section className="py-36 px-6 lg:px-14 bg-[#FFFDF8]">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-20 items-center">
           {/* Texto */}
           <div className="lg:col-span-5">
@@ -174,7 +177,7 @@ export default async function HomePage() {
 
       {/* ── PROJETOS ─────────────────────────────────────────── */}
       {featuredProjects && featuredProjects.length > 0 && (
-        <section className="py-28 px-6 lg:px-14 bg-[#F8F8F6]">
+        <section className="py-28 px-6 lg:px-14 bg-background">
           <div className="max-w-7xl mx-auto">
             {/* Header seção */}
             <div className="flex items-end justify-between mb-16">
@@ -259,46 +262,7 @@ export default async function HomePage() {
         </section>
       )}
 
-      {/* ── CTA FINAL ─────────────────────────────────────────── */}
-      <section className="relative py-44 px-6 overflow-hidden bg-[#F8F8F6]">
-        {/* Elemento decorativo */}
-        <div className="absolute inset-0 pointer-events-none">
-          <div className="absolute top-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-stone-300 to-transparent" />
-          <div className="absolute bottom-0 left-0 w-full h-px bg-gradient-to-r from-transparent via-stone-300 to-transparent" />
-          <div
-            className="absolute inset-0 opacity-[0.03]"
-            style={{
-              backgroundImage: "url('https://images.unsplash.com/photo-1618219908412-a29a1bb7b86e?w=1920&q=30')",
-              backgroundSize: 'cover',
-              backgroundPosition: 'center',
-            }}
-          />
-        </div>
-
-        <div className="relative z-10 max-w-4xl mx-auto text-center">
-          <div className="flex items-center justify-center gap-5 mb-10">
-            <span className="block w-10 h-px bg-gold" />
-            <p className="font-sans text-[9px] font-light tracking-[0.55em] uppercase text-black/30">Vamos conversar</p>
-            <span className="block w-10 h-px bg-gold" />
-          </div>
-          <h2 className="font-serif text-5xl md:text-7xl text-[#171717] mb-6 leading-none">
-            Seu projeto
-            <br />
-            <em className="text-wine not-italic">começa aqui</em>
-          </h2>
-          <p className="font-sans text-[13px] font-light text-black/40 mb-14 max-w-lg mx-auto leading-[2]">
-            Conte-nos sobre o seu espaço, seus sonhos e deixe-nos transformar tudo isso em realidade.
-          </p>
-          <div className="flex justify-center">
-            <Link
-              href="/contato"
-              className="inline-flex items-center justify-center gap-3 px-10 py-4 border border-black/20 text-black font-sans font-light tracking-[0.2em] uppercase text-[10px] hover:bg-[#171717] hover:text-white hover:border-[#171717] transition-all duration-300 cursor-pointer"
-            >
-              Formulário de contato
-            </Link>
-          </div>
-        </div>
-      </section>
+     
     </>
   )
 }

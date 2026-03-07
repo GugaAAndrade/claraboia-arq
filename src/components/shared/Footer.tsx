@@ -1,6 +1,6 @@
-import Link from 'next/link'
-import { Instagram, Mail, MapPin } from 'lucide-react'
 import { BrandLogo } from '@/components/shared/BrandLogo'
+import { Instagram, Mail, MapPin } from 'lucide-react'
+import Link from 'next/link'
 
 export function Footer() {
   return (
@@ -18,8 +18,8 @@ export function Footer() {
               variant="light"
               imageClassName="w-[260px] md:w-[320px] mb-8"
             />
-            <p className="font-sans text-[12px] font-light leading-[1.9] text-cream/55 max-w-[260px]">
-              Transformamos espaços em experiências únicas, com olhar feminino, rigor técnico e profundo cuidado com o habitar.
+            <p className="font-sans text-[12px] text-justify font-light leading-[1.9] text-cream/55 max-w-[260px]">
+              Um escritório que acredita na arquitetura como forma de revelar, conectar e transformar espaços.
             </p>
             {/* Redes */}
             <div className="flex gap-3 mt-8">
@@ -33,7 +33,7 @@ export function Footer() {
                 <Instagram size={13} strokeWidth={1.5} />
               </a>
               <a
-                href="mailto:contato@clarabolaarquitetura.com"
+                href="mailto:estudioclaraboia.arq@gmail.com"
                 className="w-9 h-9 border border-cream/20 flex items-center justify-center text-cream/50 hover:border-gold hover:text-gold transition-all duration-300 cursor-pointer"
                 aria-label="E-mail"
               >
@@ -68,11 +68,11 @@ export function Footer() {
             <h4 className="font-sans text-[9px] tracking-[0.4em] uppercase text-gold mb-7">Fale conosco</h4>
             <div className="flex flex-col gap-4">
               <a
-                href="mailto:contato@clarabolaarquitetura.com"
+                href="mailto:estudioclaraboia.arq@gmail.com"
                 className="flex items-start gap-3 font-sans text-[12px] font-light text-cream/55 hover:text-cream transition-colors group cursor-pointer"
               >
                 <Mail size={12} strokeWidth={1.5} className="mt-0.5 shrink-0" />
-                <span>contato@clarabolaarquitetura.com</span>
+                <span>estudioclaraboia.arq@gmail.com</span>
               </a>
               <a
                 href="https://www.instagram.com/claraboia.arquitetura?igsh=ZndleDFreHR5b25s"

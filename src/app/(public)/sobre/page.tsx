@@ -1,8 +1,8 @@
-import Image from 'next/image'
-import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { Architect } from '@/types'
-import { Instagram, ArrowRight } from 'lucide-react'
+import { ArrowRight, Instagram } from 'lucide-react'
+import Image from 'next/image'
+import Link from 'next/link'
 
 export const metadata = {
   title: 'Sobre',
@@ -32,19 +32,24 @@ export default async function SobrePage() {
   return (
     <>
       {/* ── HEADER ───────────────────────────────────────── */}
-      <section className="pt-24 lg:pt-28 pb-20 lg:pb-24 bg-moss overflow-hidden">
+      <section className="pt-24 lg:pt-28 pb-20 lg:pb-24 bg-wine overflow-hidden">
         <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-16 items-center">
           <div>
-            <p className="font-sans text-gold text-[10px] tracking-[0.35em] uppercase mb-4">O escritório</p>
-            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-cream leading-[0.96]">
-              Claraboia
-              <br />
-              <em className="text-rose not-italic">Arquitetura</em>
-            </h1>
-            <p className="font-sans text-cream/70 text-sm leading-[1.9] mt-7 max-w-xl">
-              A claraboia conecta interior e exterior, permitindo a entrada de luz natural e transformando a atmosfera de um espaço.
-              Mais do que um recurso técnico, para nós é um gesto arquitetônico que redefine a experiência do ambiente.
-            </p>
+            <p className="font-serif text-[20px] tracking-[0.35em] uppercase text-cream mb-4">Nossa origem</p>
+            <div className="border-l border-cream/25 pl-6 space-y-4 font-sans text-[14px] leading-[1.85] text-cream/75">
+              <p>
+                O nome Claraboia vem do elemento arquitetônico que permite a entrada de luz natural pelos tetos
+                e coberturas, iluminando os ambientes de forma suave e valorizando os espaços.
+              </p>
+              <p>
+                Na arquitetura, a luz natural é essencial para criar conforto, destacar materiais e transformar
+                a experiência de quem vive o ambiente.
+              </p>
+              <p>
+                O escritório nasceu da união de seis amigas que, ao longo da formação em arquitetura, compartilharam
+                experiências, aprendizados e o desejo de construir algo juntas.
+              </p>
+            </div>
           </div>
 
           <div className="relative">
@@ -72,7 +77,7 @@ export default async function SobrePage() {
       <section className="py-20 lg:py-24 px-6 lg:px-12 bg-[#FFFDF8] border-b border-wine/10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14">
           <div className="lg:col-span-7">
-            <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Manifesto</p>
+            <p className="font-sans text-[16px] tracking-[0.35em] uppercase text-gold mb-4">Manifesto</p>
             <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08] mb-8">
               Acreditamos que a arquitetura deve iluminar os espaços, as relações e a forma como vivemos.
             </h2>
@@ -90,59 +95,14 @@ export default async function SobrePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Nossa origem</p>
-            <div className="border-l border-wine/25 pl-6 space-y-4 font-sans text-[14px] leading-[1.85] text-moss/75">
-              <p>
-                O nome Claraboia vem do elemento arquitetônico que permite a entrada de luz natural pelos tetos
-                e coberturas, iluminando os ambientes de forma suave e valorizando os espaços.
-              </p>
-              <p>
-                Na arquitetura, a luz natural é essencial para criar conforto, destacar materiais e transformar
-                a experiência de quem vive o ambiente.
-              </p>
-              <p>
-                O escritório nasceu da união de seis amigas que, ao longo da formação em arquitetura, compartilharam
-                experiências, aprendizados e o desejo de construir algo juntas.
-              </p>
-            </div>
+            
           </div>
         </div>
       </section>
 
-      {/* ── STORYTELLING E POSICIONAMENTO ───────────────── */}
-      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-[#FFFDF8] border-b border-wine/10">
-        <div className="max-w-7xl mx-auto">
-          <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-3">Storytelling e posicionamento</p>
-          <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08]">
-            O que orienta o nosso desenho
-          </h2>
-
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
-            {[
-              {
-                title: 'Integração',
-                text: 'Conexão entre interior e exterior e uso consciente da iluminação natural.',
-              },
-              {
-                title: 'Linguagem',
-                text: 'Arquitetura moderna com sensibilidade contemporânea e impacto ambiental responsável.',
-              },
-              {
-                title: 'Experiência',
-                text: 'Espaços claros, funcionais e significativos, com foco na experiência espacial.',
-              },
-            ].map((item) => (
-              <div key={item.title} className="border-t-2 border-gold pt-6">
-                <h3 className="font-serif text-[30px] leading-none text-charcoal">{item.title}</h3>
-                <p className="font-sans text-[14px] leading-[1.85] text-moss/75 mt-4">{item.text}</p>
-              </div>
-            ))}
-          </div>
-        </div>
-      </section>
 
       {/* ── IDENTIDADE VISUAL ───────────────────────────── */}
-      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-cream/55 border-b border-wine/10">
+      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-background border-b border-wine/10">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
           <div className="lg:col-span-5 order-2 lg:order-1">
             <div className="relative aspect-[4/3] overflow-hidden border border-wine/15 bg-white">
@@ -161,7 +121,7 @@ export default async function SobrePage() {
             </div>
           </div>
           <div className="lg:col-span-7 order-1 lg:order-2">
-            <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Identidade visual</p>
+            <p className="font-sans text-[16px] tracking-[0.35em] uppercase text-gold mb-4">Identidade visual</p>
             <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08] mb-8">
               A marca como extensão da filosofia projetual
             </h2>
@@ -185,9 +145,9 @@ export default async function SobrePage() {
       </section>
 
       {/* ── NOSSA ESSÊNCIA ──────────────────────────────── */}
-      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-background border-b border-wine/10">
+      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-[#FFFDF8] border-b border-wine/10">
         <div className="max-w-7xl mx-auto">
-          <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-3">Nossa essência</p>
+          <p className="font-sans text-[16px] tracking-[0.35em] uppercase text-gold mb-3">Nossa essência</p>
           <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08]">
             Princípios que sustentam cada etapa
           </h2>
@@ -222,11 +182,11 @@ export default async function SobrePage() {
 
       {/* ── ARQUITETAS ───────────────────────────────────── */}
       {architects && architects.length > 0 && (
-        <section className="py-24 px-6 lg:px-12 bg-cream/35 border-y border-wine/10">
+        <section className="py-24 px-6 lg:px-12 bg-background border-y border-wine/10">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center gap-3 mb-16">
               <div className="w-8 h-px bg-wine" />
-              <p className="text-[10px] tracking-[0.35em] uppercase text-moss/60">A equipe</p>
+              <p className="text-[16px] tracking-[0.35em] uppercase text-moss/60">A equipe</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
@@ -278,12 +238,12 @@ export default async function SobrePage() {
       )}
 
       {/* ── CTA ──────────────────────────────────────────── */}
-      <section className="py-28 px-6 bg-background border-t border-wine/10">
+      <section className="py-28 px-6 bg-[#FFFDF8] border-t border-wine/10">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10">
           <div>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-6 h-px bg-wine" />
-              <p className="text-[10px] tracking-[0.35em] uppercase text-moss/60">Próximo passo</p>
+              <p className="text-[16px] tracking-[0.35em] uppercase text-moss/60">Próximo passo</p>
             </div>
             <h2 className="font-serif text-5xl md:text-6xl text-charcoal leading-tight">
               Vamos criar<br /><em className="text-wine not-italic">juntos?</em>
