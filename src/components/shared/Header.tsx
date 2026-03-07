@@ -29,7 +29,7 @@ export function Header() {
           href="/"
           variant="burgundy"
           className="shrink-0"
-          imageClassName="w-[180px] md:w-[220px] translate-y-[8px] md:translate-y-[10px]"
+          imageClassName="w-[180px] md:w-[220px]"
           priority
         />
 
