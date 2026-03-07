@@ -17,6 +17,22 @@ const toTitleGuess = (slug: string) =>
     .replace(/\s+/g, ' ')
     .trim()
 
+interface ProjectGallerySection {
+  name: string
+  text?: string
+  images: string[]
+}
+
+interface ProjectContentSettings {
+  logo_url?: string
+  explanation_title?: string
+  explanation_text?: string
+  sustainability_title?: string
+  sustainability_text?: string
+  technical_drawings_label?: string
+  gallery_sections?: ProjectGallerySection[]
+}
+
 export async function generateMetadata({ params }: { params: Promise<{ slug: string }> }) {
   const { slug } = await params
   const supabase = await createClient()
@@ -94,16 +110,53 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
 
   if (!project) notFound()
 
+  const { data: projectContentSetting, error: projectContentSettingError } = await supabase
+    .from('site_settings')
+    .select('value_text')
+    .eq('key', `project_content_${project.id}`)
+    .maybeSingle()
+
+  const projectContentSettingsMissing =
+    projectContentSettingError?.code === 'PGRST205' ||
+    projectContentSettingError?.message?.toLowerCase().includes("could not find the table 'public.site_settings'") ||
+    false
+
+  let projectContent: ProjectContentSettings = {}
+  if (!projectContentSettingsMissing && projectContentSetting?.value_text) {
+    try {
+      projectContent = JSON.parse(projectContentSetting.value_text) as ProjectContentSettings
+    } catch {
+      projectContent = {}
+    }
+  }
+
   const allImages = [
     ...(project.cover_url ? [project.cover_url] : []),
     ...(project.images || []).filter((img: string) => img !== project.cover_url),
   ]
   const floorPlans = Array.isArray(project.floor_plans) ? project.floor_plans.filter(Boolean) : []
+  const customSections = Array.isArray(projectContent.gallery_sections)
+    ? projectContent.gallery_sections
+      .map((section) => ({
+        name: section?.name?.trim() || '',
+        text: section?.text?.trim() || '',
+        images: Array.isArray(section?.images) ? section.images.filter(Boolean) : [],
+      }))
+      .filter((section) => section.name && section.images.length > 0)
+    : []
+  const technicalDrawingsLabel = projectContent.technical_drawings_label?.trim() || 'Estudos técnicos'
+  const explanationTitle = projectContent.explanation_title?.trim() || 'Explicação do projeto'
+  const explanationText = projectContent.explanation_text?.trim() || ''
+  const sustainabilityTitle = projectContent.sustainability_title?.trim() || 'Sustentabilidade'
+  const sustainabilityText = projectContent.sustainability_text?.trim() || ''
+  const logoUrl = projectContent.logo_url?.trim() || ''
+
   const descriptionBlocks = (project.description || '')
     .split(/\n\s*\n/)
     .map((block: string) => block.trim())
     .filter(Boolean)
   const [leadText, ...detailParagraphs] = descriptionBlocks
+
   const { data: mainArchitect } = project.architect_id
     ? await supabase.from('architects').select('*').eq('id', project.architect_id).maybeSingle()
     : { data: null }
@@ -113,10 +166,14 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
     .select('architect_id')
     .eq('project_id', project.id)
 
-  const linkedArchitectIds = (projectLinks || []).map((item) => item.architect_id).filter(Boolean) as string[]
+  const linkedArchitectIds = (projectLinks || [])
+    .map((item) => item.architect_id)
+    .filter(Boolean) as string[]
+
   const { data: linkedArchitectRows } = linkedArchitectIds.length
-    ? await supabase.from('architects').select('*').in('id', linkedArchitectIds)
+    ? await supabase.from('architects').select('*').in('id', linkedArchitectIds).order('name')
     : { data: [] }
+
   const linkedArchitects = (linkedArchitectRows || []) as {
     id: string
     name: string
@@ -130,7 +187,7 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
   return (
     <>
       {/* Breadcrumb */}
-      <div className="bg-cream py-4 px-6 border-b border-gold/20">
+      <div className="bg-[#FFFDF8] py-4 px-6 border-b border-wine/10">
         <div className="max-w-7xl mx-auto">
           <Link href="/projetos" className="inline-flex items-center gap-2 text-sm text-moss/50 hover:text-wine transition-colors">
             <ArrowLeft size={14} />
@@ -155,8 +212,13 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
         <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/35 to-black/15" />
         <div className="relative w-full p-6 md:p-12">
           <div className="max-w-7xl mx-auto">
-            <div className="inline-flex flex-col bg-black/45 backdrop-blur-sm border border-white/15 px-6 py-5 md:px-8 md:py-7">
+            <div className="inline-flex flex-col bg-black/45 backdrop-blur-sm border border-white/15 px-6 py-5 md:px-8 md:py-7 min-w-[280px]">
               <p className="text-gold text-[11px] tracking-[0.35em] uppercase mb-3">{project.typology || 'Projeto'}</p>
+              {logoUrl && (
+                <div className="relative h-12 md:h-16 w-[210px] md:w-[280px] mb-4">
+                  <Image src={logoUrl} alt={`Logomarca de ${project.title}`} fill className="object-contain object-left" />
+                </div>
+              )}
               <h1 className="font-serif text-4xl md:text-6xl !text-white leading-[0.95] [text-shadow:0_3px_22px_rgba(0,0,0,0.55)]">
                 {project.title}
               </h1>
@@ -166,13 +228,17 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
       </section>
 
       {/* Conteúdo */}
-      <section className="py-16 px-6 bg-cream">
+      <section className="py-16 px-6 bg-[#FFFDF8]">
         <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-3 gap-16">
           {/* Descrição */}
           <div className="lg:col-span-2">
             <div className="mb-12">
-              <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">Narrativa do projeto</p>
-              {leadText ? (
+              <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{explanationTitle}</p>
+              {explanationText ? (
+                <>
+                  <p className="font-serif text-2xl md:text-3xl text-moss leading-[1.35] mb-7">{explanationText}</p>
+                </>
+              ) : leadText ? (
                 <>
                   <p className="font-serif text-2xl md:text-3xl text-moss leading-[1.35] mb-7">{leadText}</p>
                   <div className="space-y-5">
@@ -190,46 +256,82 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
               )}
             </div>
 
-            {/* Galeria */}
-            {allImages.length > 0 && (
-              <div>
-                <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">Galeria do projeto</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                {allImages.map((url: string, i: number) => (
-                  <div key={i} className={`overflow-hidden bg-stone-100 ${i === 0 ? 'sm:col-span-2' : ''}`}>
-                    <div className={`relative ${i === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
-                      <Image
-                        src={url}
-                        alt={`${project.title} — imagem ${i + 1}`}
-                        fill
-                        className="object-cover hover:scale-105 transition-transform duration-700"
-                      />
-                    </div>
-                  </div>
-                ))}
-                </div>
+            {sustainabilityText && (
+              <div className="mb-14 border-l-2 border-gold pl-6">
+                <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-4">{sustainabilityTitle}</p>
+                <p className="text-moss/75 text-[16px] leading-[1.9]">{sustainabilityText}</p>
               </div>
             )}
 
-            {/* Plantas */}
-            {floorPlans.length > 0 && (
-              <div className="mt-14">
-                <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">Plantas</p>
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  {floorPlans.map((url: string, i: number) => (
-                    <div key={i} className="overflow-hidden bg-stone-100 border border-stone-200">
-                      <div className="relative aspect-[4/3]">
-                        <Image
-                          src={url}
-                          alt={`${project.title} — planta ${i + 1}`}
-                          fill
-                          className="object-contain bg-white"
-                        />
-                      </div>
+            {customSections.length > 0 ? (
+              <div className="space-y-14">
+                {customSections.map((section, sectionIndex) => (
+                  <div key={`${section.name}-${sectionIndex}`}>
+                    <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{section.name}</p>
+                    {section.text && (
+                      <p className="text-moss/70 text-[15px] leading-[1.85] mb-5">{section.text}</p>
+                    )}
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {section.images.map((url, imageIndex) => (
+                        <div key={url + imageIndex} className={`overflow-hidden bg-stone-100 ${imageIndex === 0 ? 'sm:col-span-2' : ''}`}>
+                          <div className={`relative ${imageIndex === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
+                            <Image
+                              src={url}
+                              alt={`${project.title} — ${section.name} ${imageIndex + 1}`}
+                              fill
+                              className="object-cover hover:scale-105 transition-transform duration-700"
+                            />
+                          </div>
+                        </div>
+                      ))}
                     </div>
-                  ))}
-                </div>
+                  </div>
+                ))}
               </div>
+            ) : (
+              <>
+                {/* Galeria */}
+                {allImages.length > 0 && (
+                  <div>
+                    <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">Galeria do projeto</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {allImages.map((url: string, i: number) => (
+                        <div key={i} className={`overflow-hidden bg-stone-100 ${i === 0 ? 'sm:col-span-2' : ''}`}>
+                          <div className={`relative ${i === 0 ? 'aspect-[16/9]' : 'aspect-[4/3]'}`}>
+                            <Image
+                              src={url}
+                              alt={`${project.title} — imagem ${i + 1}`}
+                              fill
+                              className="object-cover hover:scale-105 transition-transform duration-700"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Desenhos técnicos */}
+                {floorPlans.length > 0 && (
+                  <div className="mt-14">
+                    <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{technicalDrawingsLabel}</p>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+                      {floorPlans.map((url: string, i: number) => (
+                        <div key={i} className="overflow-hidden bg-stone-100 border border-stone-200">
+                          <div className="relative aspect-[4/3]">
+                            <Image
+                              src={url}
+                              alt={`${project.title} — desenho ${i + 1}`}
+                              fill
+                              className="object-contain bg-white"
+                            />
+                          </div>
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                )}
+              </>
             )}
 
             {/* Mapa */}
@@ -280,20 +382,17 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                 )}
                 <div className="flex items-center gap-2">
                   <Ruler size={14} className="text-gold" />
-                  <p className="text-moss/70 text-sm">{project.area_m2 ? `${project.area_m2} m²` : 'Área não informada'}</p>
+                  <div>
+                    <p className="text-xs tracking-widest uppercase text-gold mb-1">Área do terreno</p>
+                    <p className="text-moss/70 text-sm">{project.area_m2 ? `${project.area_m2} m²` : 'Área não informada'}</p>
+                  </div>
                 </div>
               </div>
 
-              {(project.client_name || project.project_scope || project.project_status || project.materials || project.team_notes) && (
+              {(project.project_scope || project.project_status) && (
                 <div className="border-t border-gold/20 pt-6 mb-8">
                   <p className="text-xs tracking-widest uppercase text-gold mb-4">Ficha técnica</p>
                   <div className="space-y-3 text-sm">
-                    {project.client_name && (
-                      <div>
-                        <p className="text-moss/45 uppercase tracking-wider text-[10px]">Cliente</p>
-                        <p className="text-moss">{project.client_name}</p>
-                      </div>
-                    )}
                     {project.project_status && (
                       <div>
                         <p className="text-moss/45 uppercase tracking-wider text-[10px]">Status</p>
@@ -304,18 +403,6 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                       <div>
                         <p className="text-moss/45 uppercase tracking-wider text-[10px]">Escopo</p>
                         <p className="text-moss">{project.project_scope}</p>
-                      </div>
-                    )}
-                    {project.materials && (
-                      <div>
-                        <p className="text-moss/45 uppercase tracking-wider text-[10px]">Materiais</p>
-                        <p className="text-moss">{project.materials}</p>
-                      </div>
-                    )}
-                    {project.team_notes && (
-                      <div>
-                        <p className="text-moss/45 uppercase tracking-wider text-[10px]">Equipe / Parceiros</p>
-                        <p className="text-moss">{project.team_notes}</p>
                       </div>
                     )}
                   </div>
@@ -369,14 +456,6 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                   </div>
                 </div>
               )}
-
-              {/* CTA */}
-              <Link
-                href="/contato"
-                className="w-full flex items-center justify-center gap-2 py-4 bg-wine text-cream text-sm font-medium tracking-wider uppercase hover:bg-rose transition-colors"
-              >
-                Solicitar atendimento
-              </Link>
             </div>
           </div>
         </div>

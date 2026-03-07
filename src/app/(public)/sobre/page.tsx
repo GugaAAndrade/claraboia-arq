@@ -11,114 +11,209 @@ export const metadata = {
 
 export default async function SobrePage() {
   const supabase = await createClient()
-  const [{ data: architects }, { data: aboutTeamPhoto, error: aboutTeamPhotoError }] = await Promise.all([
+  const [{ data: architects }, { data: aboutSettings, error: aboutSettingsError }] = await Promise.all([
     supabase.from('architects').select('*').order('name'),
     supabase
       .from('site_settings')
-      .select('value_text')
-      .eq('key', 'about_team_photo_url')
-      .maybeSingle(),
+      .select('key, value_text')
+      .in('key', ['about_team_photo_url', 'about_identity_visual_image_url']),
   ])
 
   const siteSettingsMissing =
-    aboutTeamPhotoError?.code === 'PGRST205' ||
-    aboutTeamPhotoError?.message?.toLowerCase().includes("could not find the table 'public.site_settings'") ||
+    aboutSettingsError?.code === 'PGRST205' ||
+    aboutSettingsError?.message?.toLowerCase().includes("could not find the table 'public.site_settings'") ||
     false
-  const aboutTeamPhotoUrl = siteSettingsMissing ? '' : (aboutTeamPhoto?.value_text || '')
+  const aboutSettingsMap = new Map((aboutSettings || []).map((item) => [item.key as string, item.value_text as string]))
+  const aboutTeamPhotoUrl = siteSettingsMissing ? '' : (aboutSettingsMap.get('about_team_photo_url') || '')
+  const aboutIdentityVisualImageUrl = siteSettingsMissing
+    ? ''
+    : (aboutSettingsMap.get('about_identity_visual_image_url') || aboutTeamPhotoUrl)
 
   return (
     <>
-      {/* ── HERO ─────────────────────────────────────────── */}
-      <section className="pt-40 pb-24 px-6 lg:px-12 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-8">
-            <div className="w-8 h-px bg-wine" />
-            <p className="text-[10px] tracking-[0.4em] uppercase text-black/30">Quem somos</p>
-          </div>
-          <h1 className="font-serif text-6xl md:text-7xl lg:text-8xl text-black font-normal leading-none tracking-tight max-w-3xl">
-            Arquitetura<br />
-            <em className="text-wine not-italic">com propósito</em>
-          </h1>
-        </div>
-      </section>
-
-      {/* ── MANIFESTO ────────────────────────────────────── */}
-      <section className="py-24 px-6 lg:px-12 bg-stone-50 border-y border-stone-100">
-        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-16 items-start">
-          {/* Citação */}
-          <div className="lg:col-span-7">
-            <div className="w-10 h-px bg-gold mb-8" />
-            <blockquote className="font-serif text-2xl md:text-3xl text-black leading-snug">
-              "Acreditamos que o espaço molda comportamentos,
-              emoções e histórias. Nossa missão é criar ambientes
-              que falam a língua de quem os habita."
-            </blockquote>
+      {/* ── HEADER ───────────────────────────────────────── */}
+      <section className="pt-24 lg:pt-28 pb-20 lg:pb-24 bg-moss overflow-hidden">
+        <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-16 items-center">
+          <div>
+            <p className="font-sans text-gold text-[10px] tracking-[0.35em] uppercase mb-4">O escritório</p>
+            <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-cream leading-[0.96]">
+              Claraboia
+              <br />
+              <em className="text-rose not-italic">Arquitetura</em>
+            </h1>
+            <p className="font-sans text-cream/70 text-sm leading-[1.9] mt-7 max-w-xl">
+              A claraboia conecta interior e exterior, permitindo a entrada de luz natural e transformando a atmosfera de um espaço.
+              Mais do que um recurso técnico, para nós é um gesto arquitetônico que redefine a experiência do ambiente.
+            </p>
           </div>
 
-          {/* Texto de apoio */}
-          <div className="lg:col-span-4 lg:col-start-9 pt-2">
-            <div className="w-6 h-px bg-stone-300 mb-6" />
-            <p className="text-black/50 leading-loose text-sm mb-5">
-              Fundado em 2026, o coletivo Claraboia nasceu do desejo de criar uma arquitetura mais humana, feminina e autoral — onde cada projeto é único e profundamente ligado ao cliente.
-            </p>
-            <p className="text-black/50 leading-loose text-sm">
-              Trabalhamos em colaboração, somando olhares e habilidades para que cada entrega supere expectativas.
-            </p>
-
-            <div className="mt-8 border border-stone-200 bg-white overflow-hidden">
-              <div className="relative aspect-[4/3]">
-                {aboutTeamPhotoUrl ? (
-                  <Image
-                    src={aboutTeamPhotoUrl}
-                    alt="Equipe Claraboia"
-                    fill
-                    className="object-cover"
-                  />
-                ) : (
-                  <div className="absolute inset-0 bg-[linear-gradient(140deg,#F7F3ED_0%,#EAE5DD_100%)] flex items-center justify-center px-8">
-                    <p className="font-serif text-2xl text-black/35 text-center">Foto da equipe</p>
-                  </div>
-                )}
-              </div>
+          <div className="relative">
+            <div className="relative aspect-[4/3] overflow-hidden border border-cream/20">
+              {aboutTeamPhotoUrl ? (
+                <Image
+                  src={aboutTeamPhotoUrl}
+                  alt="Equipe Claraboia"
+                  fill
+                  priority
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-gradient-to-br from-moss/90 to-wine/60 flex items-center justify-center px-8">
+                  <p className="font-serif text-3xl text-cream/80 text-center">Claraboia Arquitetura</p>
+                </div>
+              )}
+              <div className="absolute inset-0 bg-gradient-to-t from-moss/35 to-transparent" />
             </div>
           </div>
         </div>
       </section>
 
-      {/* ── VALORES ──────────────────────────────────────── */}
-      <section className="py-24 px-6 lg:px-12 bg-white">
-        <div className="max-w-7xl mx-auto">
-          <div className="flex items-center gap-3 mb-14">
-            <div className="w-8 h-px bg-wine" />
-            <p className="text-[10px] tracking-[0.35em] uppercase text-black/30">Nossa essência</p>
+      {/* ── MANIFESTO ────────────────────────────────────── */}
+      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-[#FFFDF8] border-b border-wine/10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14">
+          <div className="lg:col-span-7">
+            <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Manifesto</p>
+            <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08] mb-8">
+              Acreditamos que a arquitetura deve iluminar os espaços, as relações e a forma como vivemos.
+            </h2>
+            <div className="space-y-4 font-sans text-[14px] leading-[1.9] text-moss/75">
+              <p>
+                Somos seis mulheres criativas que enxergam a arquitetura como ferramenta de transformação urbana,
+                ambiental e cotidiana. Inspiradas pela arquitetura moderna e contemporânea, projetamos com linhas
+                claras, volumetrias bem definidas e integração com o entorno.
+              </p>
+              <p>
+                Assim como a claraboia rompe a cobertura para permitir a entrada da luz, nossos projetos rompem
+                padrões superficiais para revelar o essencial.
+              </p>
+              <p>Projetamos com intenção. Projetamos com consciência. Projetamos para gerar impacto.</p>
+            </div>
           </div>
+          <div className="lg:col-span-5">
+            <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Nossa origem</p>
+            <div className="border-l border-wine/25 pl-6 space-y-4 font-sans text-[14px] leading-[1.85] text-moss/75">
+              <p>
+                O nome Claraboia vem do elemento arquitetônico que permite a entrada de luz natural pelos tetos
+                e coberturas, iluminando os ambientes de forma suave e valorizando os espaços.
+              </p>
+              <p>
+                Na arquitetura, a luz natural é essencial para criar conforto, destacar materiais e transformar
+                a experiência de quem vive o ambiente.
+              </p>
+              <p>
+                O escritório nasceu da união de seis amigas que, ao longo da formação em arquitetura, compartilharam
+                experiências, aprendizados e o desejo de construir algo juntas.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
 
-          <div className="grid grid-cols-1 md:grid-cols-3 gap-px bg-stone-100">
+      {/* ── STORYTELLING E POSICIONAMENTO ───────────────── */}
+      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-[#FFFDF8] border-b border-wine/10">
+        <div className="max-w-7xl mx-auto">
+          <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-3">Storytelling e posicionamento</p>
+          <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08]">
+            O que orienta o nosso desenho
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
+            {[
+              {
+                title: 'Integração',
+                text: 'Conexão entre interior e exterior e uso consciente da iluminação natural.',
+              },
+              {
+                title: 'Linguagem',
+                text: 'Arquitetura moderna com sensibilidade contemporânea e impacto ambiental responsável.',
+              },
+              {
+                title: 'Experiência',
+                text: 'Espaços claros, funcionais e significativos, com foco na experiência espacial.',
+              },
+            ].map((item) => (
+              <div key={item.title} className="border-t-2 border-gold pt-6">
+                <h3 className="font-serif text-[30px] leading-none text-charcoal">{item.title}</h3>
+                <p className="font-sans text-[14px] leading-[1.85] text-moss/75 mt-4">{item.text}</p>
+              </div>
+            ))}
+          </div>
+        </div>
+      </section>
+
+      {/* ── IDENTIDADE VISUAL ───────────────────────────── */}
+      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-cream/55 border-b border-wine/10">
+        <div className="max-w-7xl mx-auto grid grid-cols-1 lg:grid-cols-12 gap-14 items-center">
+          <div className="lg:col-span-5 order-2 lg:order-1">
+            <div className="relative aspect-[4/3] overflow-hidden border border-wine/15 bg-white">
+              {aboutIdentityVisualImageUrl ? (
+                <Image
+                  src={aboutIdentityVisualImageUrl}
+                  alt="Claraboia Arquitetura"
+                  fill
+                  className="object-cover"
+                />
+              ) : (
+                <div className="absolute inset-0 bg-[linear-gradient(140deg,#F7F3ED_0%,#EAE5DD_100%)] flex items-center justify-center px-8">
+                  <p className="font-serif text-2xl text-moss/45 text-center">Claraboia Arquitetura</p>
+                </div>
+              )}
+            </div>
+          </div>
+          <div className="lg:col-span-7 order-1 lg:order-2">
+            <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-4">Identidade visual</p>
+            <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08] mb-8">
+              A marca como extensão da filosofia projetual
+            </h2>
+            <div className="space-y-4 font-sans text-[14px] leading-[1.9] text-moss/75">
+              <p>
+                A identidade visual da Claraboia Arquitetura foi desenhada para refletir a luz como elemento central
+                que transforma os espaços.
+              </p>
+              <p>
+                As letras “a” possuem desenho alongado e hastes abertas, simbolizando as aberturas das claraboias e
+                a entrada de ventilação e claridade. A letra “i” surge levemente inclinada, remetendo aos planos
+                diagonais dos telhados e coberturas.
+              </p>
+              <p>
+                Sobre o “i”, o ponto se transforma em um sol com 6 feixes de luz, representando as 6 integrantes do
+                escritório. A letra “o” achatada equilibra a composição e reforça o caráter moderno e sofisticado da marca.
+              </p>
+            </div>
+          </div>
+        </div>
+      </section>
+
+      {/* ── NOSSA ESSÊNCIA ──────────────────────────────── */}
+      <section className="py-20 lg:py-24 px-6 lg:px-12 bg-background border-b border-wine/10">
+        <div className="max-w-7xl mx-auto">
+          <p className="font-sans text-[10px] tracking-[0.35em] uppercase text-gold mb-3">Nossa essência</p>
+          <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08]">
+            Princípios que sustentam cada etapa
+          </h2>
+
+          <div className="grid grid-cols-1 md:grid-cols-3 gap-8 mt-12">
             {[
               {
                 num: '01',
                 title: 'Escuta ativa',
-                text: 'Cada projeto nasce de um profundo entendimento do cliente, do espaço e do contexto vivido.',
+                text: 'Cada projeto nasce do entendimento profundo do cliente, do espaço e do contexto vivido.',
               },
               {
                 num: '02',
                 title: 'Identidade coletiva',
-                text: 'Somos um coletivo. A pluralidade de olhares enriquece cada decisão e cada detalhe projetual.',
+                text: 'A pluralidade de olhares fortalece as decisões e enriquece cada detalhe projetual.',
               },
               {
                 num: '03',
                 title: 'Excelência técnica',
-                text: 'Rigor nas entregas, atenção ao detalhe e compromisso com a qualidade em cada etapa.',
+                text: 'Rigor nas entregas, atenção ao detalhe e compromisso com qualidade em todas as etapas.',
               },
             ].map((v) => (
-              <div
-                key={v.num}
-                className="bg-white p-10 group hover:bg-stone-50 transition-colors duration-300"
-              >
-                <p className="font-serif text-4xl text-stone-200 mb-6 select-none">{v.num}</p>
-                <div className="w-6 h-px bg-wine mb-5" />
-                <h3 className="font-serif text-2xl text-black mb-4">{v.title}</h3>
-                <p className="text-black/45 leading-relaxed text-sm">{v.text}</p>
+              <div key={v.num} className="border-t-2 border-wine pt-6">
+                <p className="font-serif text-4xl text-gold/65 mb-4 select-none">{v.num}</p>
+                <h3 className="font-serif text-[30px] leading-none text-charcoal">{v.title}</h3>
+                <p className="font-sans text-[14px] leading-[1.85] text-moss/75 mt-4">{v.text}</p>
               </div>
             ))}
           </div>
@@ -127,18 +222,18 @@ export default async function SobrePage() {
 
       {/* ── ARQUITETAS ───────────────────────────────────── */}
       {architects && architects.length > 0 && (
-        <section className="py-24 px-6 lg:px-12 bg-stone-50 border-t border-stone-100">
+        <section className="py-24 px-6 lg:px-12 bg-cream/35 border-y border-wine/10">
           <div className="max-w-7xl mx-auto">
             <div className="flex items-center gap-3 mb-16">
               <div className="w-8 h-px bg-wine" />
-              <p className="text-[10px] tracking-[0.35em] uppercase text-black/30">A equipe</p>
+              <p className="text-[10px] tracking-[0.35em] uppercase text-moss/60">A equipe</p>
             </div>
 
             <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
               {(architects as Architect[]).map((arch) => (
-                <div key={arch.id} className="group bg-white border border-stone-100 overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                <div key={arch.id} className="group bg-white border border-wine/10 overflow-hidden hover:shadow-lg transition-shadow duration-300">
                   {/* Foto */}
-                  <div className="aspect-[3/4] relative overflow-hidden bg-stone-100">
+                  <div className="aspect-[3/4] relative overflow-hidden bg-cream/35">
                     {arch.photo_url ? (
                       <Image
                         src={arch.photo_url}
@@ -147,8 +242,8 @@ export default async function SobrePage() {
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-stone-100">
-                        <span className="font-serif text-8xl text-stone-300">{arch.name.charAt(0)}</span>
+                      <div className="absolute inset-0 flex items-center justify-center bg-cream/35">
+                        <span className="font-serif text-8xl text-gold/45">{arch.name.charAt(0)}</span>
                       </div>
                     )}
                   </div>
@@ -158,17 +253,17 @@ export default async function SobrePage() {
                     {arch.specialty && (
                       <p className="text-[10px] tracking-[0.3em] uppercase text-wine mb-2">{arch.specialty}</p>
                     )}
-                    <h3 className="font-serif text-2xl text-black mb-3">{arch.name}</h3>
-                    <div className="w-6 h-px bg-stone-200 mb-4" />
+                    <h3 className="font-serif text-2xl text-charcoal mb-3">{arch.name}</h3>
+                    <div className="w-6 h-px bg-gold/55 mb-4" />
                     {arch.bio && (
-                      <p className="text-black/50 text-sm leading-relaxed mb-5 line-clamp-3">{arch.bio}</p>
+                      <p className="text-moss/75 text-sm leading-relaxed mb-5 line-clamp-3">{arch.bio}</p>
                     )}
                     {arch.instagram && (
                       <a
                         href={`https://instagram.com/${arch.instagram.replace('@', '')}`}
                         target="_blank"
                         rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] uppercase text-black/35 hover:text-wine transition-colors"
+                        className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] uppercase text-wine hover:text-rose transition-colors"
                       >
                         <Instagram size={12} />
                         {arch.instagram}
@@ -183,24 +278,24 @@ export default async function SobrePage() {
       )}
 
       {/* ── CTA ──────────────────────────────────────────── */}
-      <section className="py-28 px-6 bg-white border-t border-stone-100">
+      <section className="py-28 px-6 bg-background border-t border-wine/10">
         <div className="max-w-7xl mx-auto flex flex-col lg:flex-row items-start lg:items-center justify-between gap-10">
           <div>
             <div className="flex items-center gap-3 mb-5">
               <div className="w-6 h-px bg-wine" />
-              <p className="text-[10px] tracking-[0.35em] uppercase text-black/30">Próximo passo</p>
+              <p className="text-[10px] tracking-[0.35em] uppercase text-moss/60">Próximo passo</p>
             </div>
-            <h2 className="font-serif text-5xl md:text-6xl text-black leading-tight">
+            <h2 className="font-serif text-5xl md:text-6xl text-charcoal leading-tight">
               Vamos criar<br /><em className="text-wine not-italic">juntos?</em>
             </h2>
           </div>
           <div className="lg:text-right">
-            <p className="text-black/50 mb-8 max-w-sm leading-relaxed text-sm">
+            <p className="text-moss/75 mb-8 max-w-sm leading-relaxed text-sm">
               Conte-nos sobre o seu espaço e transformamos sua ideia em realidade.
             </p>
             <Link
               href="/contato"
-              className="group inline-flex items-center gap-3 bg-wine text-white px-10 py-4 text-[11px] font-medium tracking-[0.2em] uppercase hover:bg-black transition-all duration-300"
+              className="group inline-flex items-center gap-3 bg-wine text-white px-10 py-4 text-[11px] font-medium tracking-[0.2em] uppercase hover:bg-moss transition-all duration-300"
             >
               Fale conosco
               <ArrowRight size={13} className="group-hover:translate-x-1 transition-transform" />

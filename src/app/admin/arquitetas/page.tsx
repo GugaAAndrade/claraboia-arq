@@ -3,7 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Architect } from '@/types'
 import { Plus, Pencil } from 'lucide-react'
-import { AboutTeamPhotoSettings } from '@/components/admin/AboutTeamPhotoSettings'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 
 export default async function AdminArquitetasPage() {
   const supabase = await createClient()
@@ -11,21 +11,11 @@ export default async function AdminArquitetasPage() {
   if (!user) redirect('/admin/login')
 
   const { data: architects } = await supabase.from('architects').select('*').order('name')
-  const { data: aboutTeamPhoto, error: aboutTeamPhotoError } = await supabase
-    .from('site_settings')
-    .select('value_text')
-    .eq('key', 'about_team_photo_url')
-    .maybeSingle()
-  const siteSettingsMissing =
-    aboutTeamPhotoError?.code === 'PGRST205' ||
-    aboutTeamPhotoError?.message?.toLowerCase().includes("could not find the table 'public.site_settings'") ||
-    false
-
   return (
     <div className="flex min-h-screen flex-col md:flex-row">
       <aside className="w-full md:w-64 bg-moss md:min-h-screen shrink-0">
         <div className="p-6 border-b border-cream/10">
-          <Link href="/admin" className="font-serif text-xl text-cream">Claraboia</Link>
+          <BrandLogo href="/admin" variant="light" imageClassName="w-[150px]" />
         </div>
         <nav className="py-3 md:py-6 flex md:block overflow-x-auto md:overflow-visible border-t border-cream/10 md:border-t-0">
           {[
@@ -33,6 +23,7 @@ export default async function AdminArquitetasPage() {
             { href: '/admin/projetos', label: 'Projetos' },
             { href: '/admin/arquitetas', label: 'Arquitetas', active: true },
             { href: '/admin/contatos', label: 'Contatos' },
+            { href: '/admin/configuracoes', label: 'Configurações' },
           ].map((item) => (
             <Link key={item.href} href={item.href} className={`block whitespace-nowrap px-4 md:px-6 py-3 text-sm ${item.active ? 'bg-gold/20 text-gold' : 'text-cream/60 hover:text-cream'}`}>
               {item.label}
@@ -53,11 +44,6 @@ export default async function AdminArquitetasPage() {
             <Plus size={16} /> Nova arquiteta
           </Link>
         </div>
-
-        <AboutTeamPhotoSettings
-          initialUrl={aboutTeamPhoto?.value_text || ''}
-          siteSettingsMissing={siteSettingsMissing}
-        />
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           {(architects as Architect[])?.map((arch) => (

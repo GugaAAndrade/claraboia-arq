@@ -6,6 +6,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/client'
 import { ArrowLeft, Save, Trash2 } from 'lucide-react'
 import { ImageUpload } from '@/components/ui/ImageUpload'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 
 interface FormData {
   name: string
@@ -64,7 +65,7 @@ export default function ArquitetaFormPage() {
     <div className="flex min-h-screen flex-col md:flex-row">
       <aside className="w-full md:w-64 bg-moss md:min-h-screen shrink-0">
         <div className="p-6 border-b border-cream/10">
-          <Link href="/admin" className="font-serif text-xl text-cream">Claraboia</Link>
+          <BrandLogo href="/admin" variant="light" imageClassName="w-[150px]" />
         </div>
         <nav className="py-3 md:py-6 flex md:block overflow-x-auto md:overflow-visible border-t border-cream/10 md:border-t-0">
           {[

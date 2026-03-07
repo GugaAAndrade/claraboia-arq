@@ -1,16 +1,18 @@
 import type { Metadata } from 'next'
 import './globals.css'
-import { Cinzel, Josefin_Sans } from 'next/font/google'
+import { Forum, Montserrat } from 'next/font/google'
 
-const cinzel = Cinzel({
+const forum = Forum({
   subsets: ['latin'],
-  variable: '--font-cinzel',
+  weight: ['400'],
+  variable: '--font-forum',
   display: 'swap',
 })
 
-const josefinSans = Josefin_Sans({
+const montserrat = Montserrat({
   subsets: ['latin'],
-  variable: '--font-josefin-sans',
+  weight: ['100', '200', '300', '400'],
+  variable: '--font-montserrat',
   display: 'swap',
 })
 
@@ -34,7 +36,7 @@ export default function RootLayout({
   children: React.ReactNode
 }) {
   return (
-    <html lang="pt-BR" className={`${cinzel.variable} ${josefinSans.variable}`}>
+    <html lang="pt-BR" className={`${forum.variable} ${montserrat.variable}`}>
       <body className="min-h-screen">{children}</body>
     </html>
   )

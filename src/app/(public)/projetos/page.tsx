@@ -16,7 +16,7 @@ const slugify = (value: string) =>
 
 export const metadata = {
   title: 'Projetos · Claraboia Arquitetura',
-  description: 'Portfólio completo da Claraboia Arquitetura — projetos residenciais, comerciais e de interiores.',
+  description: 'Projetos da Claraboia Arquitetura — residenciais, comerciais e de interiores.',
 }
 
 export default async function ProjetosPage({
@@ -71,30 +71,25 @@ export default async function ProjetosPage({
   })
 
   const activeTypology = tipologia || 'Todos'
-
   return (
     <>
-      {/* Hero da página — estilo editorial */}
-      <section className="pt-44 pb-24 px-6 lg:px-14 bg-white relative overflow-hidden">
-        <div className="absolute left-0 top-0 h-full w-px bg-gradient-to-b from-transparent via-stone-200 to-transparent hidden lg:block ml-14" />
-        <div className="max-w-7xl mx-auto">
-          <span className="block w-10 h-px bg-gold mb-8" />
-          <p className="font-sans text-[9px] font-light tracking-[0.55em] uppercase text-black/30 mb-6">Portfólio</p>
-          <h1 className="font-serif text-[64px] md:text-[88px] text-[#171717] leading-none tracking-tight mb-6">
-            Nossos
-            <br />
-            <em className="text-wine not-italic">projetos</em>
+      {/* Hero */}
+      <section className="bg-moss py-20 lg:py-28 px-6 lg:px-12 relative overflow-hidden">
+        <div className="max-w-7xl mx-auto relative">
+          <p className="text-gold text-[10px] tracking-[0.35em] uppercase mb-4">Projetos</p>
+          <h1 className="font-serif text-5xl md:text-6xl lg:text-7xl text-cream leading-[0.96]">
+            Projetos
           </h1>
-          <p className="font-sans text-[13px] font-light text-black/45 max-w-xs leading-[2]">
-            Cada espaço tem uma história. Cada projeto, uma alma.
+          <p className="text-cream/60 text-sm mt-5 max-w-md leading-relaxed">
+            Espacos desenhados com precisao, atmosfera e identidade.
           </p>
         </div>
       </section>
 
       {/* Filtros — faixa sticky minimalista */}
-      <section className="sticky top-[72px] z-40 bg-white/95 backdrop-blur-md border-y border-stone-100 py-5 px-6 lg:px-14">
+      <section className="sticky top-[72px] z-40 bg-[#FAF5EA]/95 backdrop-blur-md border-y border-wine/10 py-5 px-6 lg:px-14">
         <div className="max-w-7xl mx-auto flex flex-wrap gap-2 items-center">
-          <span className="font-sans text-[9px] tracking-[0.4em] uppercase text-black/25 mr-3">Filtrar</span>
+          <span className="font-sans text-[9px] tracking-[0.4em] uppercase text-moss/45 mr-3">Filtrar</span>
 
           {TYPOLOGIES.map((t) => (
             <Link
@@ -102,8 +97,8 @@ export default async function ProjetosPage({
               href={t === 'Todos' ? '/projetos' : `/projetos?tipologia=${t}${arquiteta ? `&arquiteta=${arquiteta}` : ''}`}
               className={`px-5 py-1.5 font-sans text-[9px] font-light tracking-[0.25em] uppercase border transition-all duration-200 cursor-pointer ${
                 activeTypology === t
-                  ? 'bg-[#171717] text-white border-[#171717]'
-                  : 'border-stone-200 text-black/40 hover:border-black/40 hover:text-black'
+                  ? 'bg-moss text-cream border-moss'
+                  : 'border-wine/20 text-moss/65 hover:border-wine/45 hover:text-wine'
               }`}
             >
               {t}
@@ -112,15 +107,15 @@ export default async function ProjetosPage({
 
           {architects && architects.length > 0 && (
             <>
-              <span className="font-sans text-[9px] tracking-[0.4em] uppercase text-black/20 ml-4 mr-2">Arquiteta</span>
+              <span className="font-sans text-[9px] tracking-[0.4em] uppercase text-moss/45 ml-4 mr-2">Arquiteta</span>
               {architects.map((a) => (
                 <Link
                   key={a.id}
                   href={`/projetos?${tipologia && tipologia !== 'Todos' ? `tipologia=${tipologia}&` : ''}arquiteta=${arquiteta === a.id ? '' : a.id}`}
                   className={`px-5 py-1.5 font-sans text-[9px] font-light tracking-[0.25em] uppercase border transition-all duration-200 cursor-pointer ${
                     arquiteta === a.id
-                      ? 'bg-wine text-white border-wine'
-                      : 'border-stone-200 text-black/40 hover:border-wine/60 hover:text-wine'
+                      ? 'bg-wine text-cream border-wine'
+                      : 'border-wine/20 text-moss/65 hover:border-wine/60 hover:text-wine'
                   }`}
                 >
                   {a.name.split(' ')[0]}
@@ -132,30 +127,30 @@ export default async function ProjetosPage({
       </section>
 
       {/* Grid de projetos */}
-      <section className="py-16 px-6 lg:px-14 bg-white min-h-[60vh]">
+      <section className="py-16 px-6 lg:px-14 bg-[#FAF5EA] min-h-[60vh]">
         <div className="max-w-7xl mx-auto">
           {!projects || projects.length === 0 ? (
             <div className="flex flex-col items-center justify-center py-36 text-center">
-              <p className="font-serif text-4xl text-black/20 mb-4">Nenhum projeto encontrado</p>
-              <p className="font-sans text-[12px] font-light text-black/30 mb-8">Tente remover os filtros para ver todos os projetos.</p>
+              <p className="font-serif text-4xl text-moss/35 mb-4">Nenhum projeto encontrado</p>
+              <p className="font-sans text-[12px] font-light text-moss/55 mb-8">Tente remover os filtros para ver todos os projetos.</p>
               <Link
                 href="/projetos"
-                className="font-sans text-[10px] font-light tracking-[0.3em] uppercase border-b border-black/20 pb-px hover:border-gold hover:text-gold cursor-pointer transition-colors"
+                className="font-sans text-[10px] font-light tracking-[0.3em] uppercase border-b border-wine/30 pb-px hover:border-gold hover:text-gold cursor-pointer transition-colors"
               >
                 Ver todos os projetos
               </Link>
             </div>
           ) : (
-            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-stone-100">
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-px bg-wine/10">
               {projects.map((project) => {
                 return (
                 <Link
                   key={project.id}
                   href={`/projetos/${encodeURIComponent(project.slug || slugify(project.title))}`}
-                  className="group relative overflow-hidden bg-white cursor-pointer"
+                  className="group relative overflow-hidden bg-[#FFFDF8] cursor-pointer"
                 >
                   {/* Imagem */}
-                  <div className="aspect-[4/3] bg-stone-100 relative overflow-hidden">
+                  <div className="aspect-[4/3] bg-cream/35 relative overflow-hidden">
                     {project.cover_url ? (
                       <Image
                         src={project.cover_url}
@@ -164,39 +159,39 @@ export default async function ProjetosPage({
                         className="object-cover group-hover:scale-105 transition-transform duration-700"
                       />
                     ) : (
-                      <div className="absolute inset-0 bg-gradient-to-br from-stone-100 to-stone-200 flex items-center justify-center">
-                        <span className="font-serif text-7xl text-stone-300">{project.title.charAt(0)}</span>
+                      <div className="absolute inset-0 bg-gradient-to-br from-cream/45 to-background flex items-center justify-center">
+                        <span className="font-serif text-7xl text-gold/45">{project.title.charAt(0)}</span>
                       </div>
                     )}
 
                     {/* Overlay com info */}
-                    <div className="absolute inset-0 bg-gradient-to-t from-black/75 via-black/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
+                    <div className="absolute inset-0 bg-gradient-to-t from-moss/80 via-moss/10 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-400" />
                     <div className="absolute bottom-0 left-0 right-0 p-6 translate-y-2 opacity-0 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-400">
                       <p className="font-sans text-[9px] text-gold tracking-[0.4em] uppercase mb-2">{project.typology}</p>
-                      <p className="font-serif text-white text-lg">{project.title}</p>
+                      <p className="font-serif text-cream text-lg">{project.title}</p>
                     </div>
 
                     {/* Arrow */}
-                    <div className="absolute top-4 right-4 w-8 h-8 bg-white flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
-                      <ArrowUpRight size={13} strokeWidth={1.5} className="text-black" />
+                    <div className="absolute top-4 right-4 w-8 h-8 bg-cream/90 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+                      <ArrowUpRight size={13} strokeWidth={1.5} className="text-moss" />
                     </div>
                   </div>
 
                   {/* Info abaixo */}
-                  <div className="p-6 bg-[#171717] border-t border-white/10">
+                  <div className="p-6 bg-moss border-t border-cream/10">
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <p className="font-sans text-[8px] font-light tracking-[0.4em] uppercase text-gold">{project.typology}</p>
-                      <p className="font-sans text-[10px] font-light text-white/45 shrink-0">{project.year}</p>
+                      <p className="font-sans text-[10px] font-light text-cream/55 shrink-0">{project.year}</p>
                     </div>
-                    <h2 className="font-serif text-lg text-white group-hover:text-gold transition-colors">
+                    <h2 className="font-serif text-lg text-cream group-hover:text-gold transition-colors">
                       {project.title}
                     </h2>
                     <div className="flex items-center justify-between mt-2">
                       {project.architectsLabel && (
-                        <p className="font-sans text-[11px] font-light text-white/65">{project.architectsLabel}</p>
+                        <p className="font-sans text-[11px] font-light text-cream/75">{project.architectsLabel}</p>
                       )}
                       {project.location && (
-                        <p className="font-sans text-[10px] font-light text-white/45">{project.location}</p>
+                        <p className="font-sans text-[10px] font-light text-cream/55">{project.location}</p>
                       )}
                     </div>
                   </div>

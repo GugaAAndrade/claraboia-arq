@@ -1,7 +1,8 @@
 import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
-import { LayoutGrid, Users, Mail, LogOut, Plus } from 'lucide-react'
+import { LayoutGrid, Users, Mail, LogOut, Plus, Settings } from 'lucide-react'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 
 export default async function AdminDashboardPage() {
   const supabase = await createClient()
@@ -27,7 +28,7 @@ export default async function AdminDashboardPage() {
       {/* Sidebar */}
       <aside className="w-full md:w-64 bg-moss md:min-h-screen flex flex-col shrink-0">
         <div className="p-6 border-b border-cream/10">
-          <h1 className="font-serif text-xl text-cream">Claraboia</h1>
+          <BrandLogo href="/admin" variant="light" imageClassName="w-[150px]" />
           <p className="text-cream/40 text-xs mt-1">Painel administrativo</p>
         </div>
 
@@ -37,6 +38,7 @@ export default async function AdminDashboardPage() {
             { href: '/admin/projetos', icon: LayoutGrid, label: 'Projetos' },
             { href: '/admin/arquitetas', icon: Users, label: 'Arquitetas' },
             { href: '/admin/contatos', icon: Mail, label: 'Contatos' },
+            { href: '/admin/configuracoes', icon: Settings, label: 'Configurações' },
           ].map((item) => (
             <Link
               key={item.href}

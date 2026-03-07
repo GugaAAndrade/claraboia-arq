@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Plus, Pencil, Star } from 'lucide-react'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 
 const slugify = (value: string) =>
   value
@@ -56,7 +57,7 @@ export default async function AdminProjetosPage() {
       {/* Sidebar simples */}
       <aside className="w-full md:w-64 bg-moss md:min-h-screen shrink-0">
         <div className="p-6 border-b border-cream/10">
-          <Link href="/admin" className="font-serif text-xl text-cream">Claraboia</Link>
+          <BrandLogo href="/admin" variant="light" imageClassName="w-[150px]" />
         </div>
         <nav className="py-3 md:py-6 flex md:block overflow-x-auto md:overflow-visible border-t border-cream/10 md:border-t-0">
           {[
@@ -64,6 +65,7 @@ export default async function AdminProjetosPage() {
             { href: '/admin/projetos', label: 'Projetos', active: true },
             { href: '/admin/arquitetas', label: 'Arquitetas' },
             { href: '/admin/contatos', label: 'Contatos' },
+            { href: '/admin/configuracoes', label: 'Configurações' },
           ].map((item) => (
             <Link
               key={item.href}

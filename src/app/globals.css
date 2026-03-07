@@ -1,14 +1,14 @@
 @import "tailwindcss";
 
 :root {
-  --wine:   #7A2D3A;
+  --wine:   #6C3233;
   --rose:   #BF5A6C;
-  --gold:   #C9A84C;
-  --cream:  #FAFAF8;
-  --moss:   #1A1A1A;
+  --gold:   #AC914C;
+  --cream:  #F4E7C0;
+  --moss:   #39391E;
   --charcoal: #2A2A2A;
 
-  --background: #FFFFFF;
+  --background: #FAF5EA;
   --foreground: #171717;
 }
 
@@ -21,8 +21,8 @@
   --color-charcoal:   var(--charcoal);
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-serif: var(--font-cinzel), Georgia, serif;
-  --font-sans:  var(--font-josefin-sans), system-ui, sans-serif;
+  --font-serif: var(--font-forum), Georgia, serif;
+  --font-sans:  var(--font-montserrat), system-ui, sans-serif;
 }
 
 *, *::before, *::after {
@@ -88,4 +88,9 @@ h1, h2, h3, h4 {
 
 @media (prefers-reduced-motion: reduce) {
   .animate-fade-up { animation: none; }
+}
+
+.topics-group:hover .topic-card:not(:hover) {
+  filter: blur(1.6px);
+  opacity: 0.9;
 }

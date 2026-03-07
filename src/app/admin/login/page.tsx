@@ -3,6 +3,7 @@
 import { useState } from 'react'
 import { createClient } from '@/lib/supabase/client'
 import { Eye, EyeOff } from 'lucide-react'
+import { BrandLogo } from '@/components/shared/BrandLogo'
 
 export default function AdminLoginPage() {
   const [email, setEmail] = useState('')
@@ -48,7 +49,9 @@ export default function AdminLoginPage() {
       <div className="w-full max-w-sm">
         {/* Logo */}
         <div className="text-center mb-12">
-          <h1 className="font-serif text-3xl text-cream">Claraboia<br /><span className="text-gold">Arquitetura</span></h1>
+          <div className="flex justify-center">
+            <BrandLogo variant="light" imageClassName="w-[220px]" />
+          </div>
           <p className="text-cream/40 text-xs tracking-widest uppercase mt-3">Área restrita</p>
         </div>
 
