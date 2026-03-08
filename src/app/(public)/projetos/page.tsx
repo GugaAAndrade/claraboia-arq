@@ -147,7 +147,7 @@ export default async function ProjetosPage({
                 <Link
                   key={project.id}
                   href={`/projetos/${encodeURIComponent(project.slug || slugify(project.title))}`}
-                  className="group relative overflow-hidden bg-[#FFFDF8] cursor-pointer"
+                  className="group relative overflow-hidden bg-[#FFFDF8] cursor-pointer h-full flex flex-col"
                 >
                   {/* Imagem */}
                   <div className="aspect-[4/3] bg-cream/35 relative overflow-hidden">
@@ -178,20 +178,24 @@ export default async function ProjetosPage({
                   </div>
 
                   {/* Info abaixo */}
-                  <div className="p-6 bg-moss border-t border-cream/10">
+                  <div className="p-6 bg-moss border-t border-cream/10 min-h-[178px] flex flex-col">
                     <div className="flex items-start justify-between gap-2 mb-1">
                       <p className="font-sans text-[8px] font-light tracking-[0.4em] uppercase text-gold">{project.typology}</p>
                       <p className="font-sans text-[10px] font-light text-cream/55 shrink-0">{project.year}</p>
                     </div>
-                    <h2 className="font-serif text-lg text-cream group-hover:text-gold transition-colors">
+                    <h2 className="font-serif text-lg text-cream group-hover:text-gold transition-colors min-h-[56px] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:2] overflow-hidden">
                       {project.title}
                     </h2>
-                    <div className="flex items-center justify-between mt-2">
+                    <div className="mt-2 grid grid-cols-[minmax(0,1fr)_auto] items-start gap-3">
                       {project.architectsLabel && (
-                        <p className="font-sans text-[11px] font-light text-cream/75">{project.architectsLabel}</p>
+                        <p className="font-sans text-[11px] font-light text-cream/75 min-h-[56px] [display:-webkit-box] [-webkit-box-orient:vertical] [-webkit-line-clamp:3] overflow-hidden">
+                          {project.architectsLabel}
+                        </p>
                       )}
                       {project.location && (
-                        <p className="font-sans text-[10px] font-light text-cream/55">{project.location}</p>
+                        <p className="font-sans text-[10px] font-light text-cream/55 text-right whitespace-pre-line">
+                          {project.location}
+                        </p>
                       )}
                     </div>
                   </div>

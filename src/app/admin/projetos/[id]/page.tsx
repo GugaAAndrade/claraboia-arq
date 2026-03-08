@@ -20,7 +20,6 @@ const slugify = (value: string) =>
 interface FormData {
   title: string
   slug: string
-  description: string
   gallery_images: string[]
   floor_plans: string[]
   typology: string
@@ -54,6 +53,16 @@ interface ProjectActionButton {
   url: string
 }
 
+interface ProjectSustainabilityCard {
+  label: string
+  description: string
+}
+
+interface ProjectCardSection {
+  title: string
+  cards: ProjectSustainabilityCard[]
+}
+
 interface ProjectContentSettings {
   custom_typology: string
   details_title: string
@@ -61,8 +70,7 @@ interface ProjectContentSettings {
   logo_url: string
   explanation_title: string
   explanation_text: string
-  sustainability_title: string
-  sustainability_text: string
+  card_sections: ProjectCardSection[]
   detail_fields: ProjectDetailField[]
   technical_fields: ProjectDetailField[]
   action_buttons: ProjectActionButton[]
@@ -76,8 +84,7 @@ const defaultContentSettings: ProjectContentSettings = {
   logo_url: '',
   explanation_title: 'Explicação do projeto',
   explanation_text: '',
-  sustainability_title: 'Sustentabilidade',
-  sustainability_text: '',
+  card_sections: [],
   detail_fields: [],
   technical_fields: [],
   action_buttons: [],
@@ -91,7 +98,7 @@ export default function ProjetoFormPage() {
   const supabase = createClient()
 
   const [form, setForm] = useState<FormData>({
-    title: '', slug: '', description: '', gallery_images: [], floor_plans: [], typology: '', year: new Date().getFullYear().toString(),
+    title: '', slug: '', gallery_images: [], floor_plans: [], typology: '', year: new Date().getFullYear().toString(),
     location: '', client_name: '', area_m2: '', project_scope: '', project_status: '', materials: '', team_notes: '', map_embed_url: '',
     architect_ids: [], cover_url: '', featured: false,
   })
@@ -115,7 +122,6 @@ export default function ProjetoFormPage() {
       if (proj) setForm({
         title: proj.title || '',
         slug: proj.slug || '',
-        description: proj.description || '',
         gallery_images: Array.isArray(proj.images) ? proj.images : [],
         floor_plans: Array.isArray(proj.floor_plans) ? proj.floor_plans : [],
         typology: proj.typology || '',
@@ -145,6 +151,14 @@ export default function ProjetoFormPage() {
         if (contentSettingRow?.value_text) {
           try {
             const parsed = JSON.parse(contentSettingRow.value_text) as Partial<ProjectContentSettings>
+            const legacySustainabilityTitle =
+              typeof (parsed as { sustainability_title?: unknown }).sustainability_title === 'string'
+                ? ((parsed as { sustainability_title?: string }).sustainability_title || '').trim()
+                : 'Sustentabilidade'
+            const legacySustainabilityText =
+              typeof (parsed as { sustainability_text?: unknown }).sustainability_text === 'string'
+                ? ((parsed as { sustainability_text?: string }).sustainability_text || '').trim()
+                : ''
             setContentSettings({
               ...defaultContentSettings,
               ...parsed,
@@ -173,6 +187,30 @@ export default function ProjetoFormPage() {
                   url: button?.url || '',
                 }))
                 : [],
+              card_sections: Array.isArray(parsed.card_sections)
+                ? parsed.card_sections.map((section) => ({
+                  title: section?.title || '',
+                  cards: Array.isArray(section?.cards)
+                    ? section.cards.map((card) => ({
+                      label: card?.label || '',
+                      description: card?.description || '',
+                    }))
+                    : [],
+                }))
+                : (
+                  Array.isArray((parsed as { sustainability_cards?: ProjectSustainabilityCard[] }).sustainability_cards)
+                    ? [{
+                      title: legacySustainabilityTitle || 'Sustentabilidade',
+                      cards: ((parsed as { sustainability_cards?: ProjectSustainabilityCard[] }).sustainability_cards || []).map((card) => ({
+                        label: card?.label || '',
+                        description: card?.description || '',
+                      })),
+                    }]
+                    : (legacySustainabilityText ? [{
+                      title: legacySustainabilityTitle || 'Sustentabilidade',
+                      cards: [{ label: '', description: legacySustainabilityText }],
+                    }] : [])
+                ),
             })
           } catch {
             setContentSettings(defaultContentSettings)
@@ -210,7 +248,6 @@ export default function ProjetoFormPage() {
     const payload = {
       title: form.title,
       slug: form.slug?.trim() ? slugify(form.slug) : slugify(form.title),
-      description: form.description,
       typology: null,
       location: form.location || null,
       client_name: null,
@@ -281,8 +318,14 @@ export default function ProjetoFormPage() {
       logo_url: (contentSettings.logo_url || '').trim(),
       explanation_title: (contentSettings.explanation_title || '').trim() || 'Explicação do projeto',
       explanation_text: (contentSettings.explanation_text || '').trim(),
-      sustainability_title: (contentSettings.sustainability_title || '').trim() || 'Sustentabilidade',
-      sustainability_text: (contentSettings.sustainability_text || '').trim(),
+      card_sections: contentSettings.card_sections
+        .map((section) => ({
+          title: section.title.trim(),
+          cards: section.cards
+            .map((card) => ({ label: card.label.trim(), description: card.description.trim() }))
+            .filter((card) => card.label || card.description),
+        }))
+        .filter((section) => section.title || section.cards.length > 0),
       detail_fields: contentSettings.detail_fields
         .map((field) => ({ label: field.label.trim(), value: field.value.trim() }))
         .filter((field) => field.label && field.value),
@@ -373,16 +416,6 @@ export default function ProjetoFormPage() {
                 className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine font-mono text-sm" />
             </div>
 
-            {/* Descrição */}
-            <div>
-              <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Descrição</label>
-              <textarea rows={8} value={form.description} onChange={(e) => setForm({ ...form, description: e.target.value })}
-                className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine resize-none" />
-              <p className="mt-2 text-xs text-moss/45">
-                Use parágrafos separados por linha em branco para criar uma narrativa mais detalhada na página pública.
-              </p>
-            </div>
-
             <div className="border border-moss/15 p-5 bg-[#FFFCF5] space-y-5">
               <div>
                 <p className="text-xs tracking-widest uppercase text-moss/50 mb-1">Conteúdo avançado da página</p>
@@ -460,27 +493,149 @@ export default function ProjetoFormPage() {
                 />
               </div>
 
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Título de sustentabilidade</label>
-                  <input
-                    type="text"
-                    value={contentSettings.sustainability_title}
-                    onChange={(e) => setContentSettings((current) => ({ ...current, sustainability_title: e.target.value }))}
-                    className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
-                    placeholder="Sustentabilidade"
-                  />
+              <div className="space-y-4 border-t border-moss/15 pt-5">
+                <div className="flex items-center justify-between">
+                  <label className="block text-xs tracking-widest uppercase text-moss/50">Seções de cards (genérico)</label>
+                  <button
+                    type="button"
+                    onClick={() =>
+                      setContentSettings((current) => ({
+                        ...current,
+                        card_sections: [...current.card_sections, { title: '', cards: [] }],
+                      }))
+                    }
+                    className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
+                  >
+                    <Plus size={12} /> Adicionar seção
+                  </button>
                 </div>
-                <div>
-                  <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Texto de sustentabilidade</label>
-                  <textarea
-                    rows={3}
-                    value={contentSettings.sustainability_text}
-                    onChange={(e) => setContentSettings((current) => ({ ...current, sustainability_text: e.target.value }))}
-                    className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine resize-none"
-                    placeholder="Estratégias passivas, materiais e eficiência do projeto..."
-                  />
-                </div>
+
+                {contentSettings.card_sections.length === 0 ? (
+                  <div className="border border-dashed border-moss/20 p-4 text-sm text-moss/50">
+                    Nenhuma seção de cards cadastrada.
+                  </div>
+                ) : (
+                  <div className="space-y-6">
+                    {contentSettings.card_sections.map((section, sectionIndex) => (
+                      <div key={sectionIndex} className="border border-moss/15 p-4 bg-white space-y-4">
+                        <div>
+                          <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Título da seção</label>
+                          <input
+                            type="text"
+                            value={section.title}
+                            onChange={(e) =>
+                              setContentSettings((current) => {
+                                const next = [...current.card_sections]
+                                next[sectionIndex] = { ...next[sectionIndex], title: e.target.value }
+                                return { ...current, card_sections: next }
+                              })
+                            }
+                            className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                            placeholder="Sustentabilidade, Premissas, Diferenciais..."
+                          />
+                        </div>
+
+                        <div className="flex items-center justify-between">
+                          <p className="text-xs tracking-widest uppercase text-moss/50">Cards da seção</p>
+                          <button
+                            type="button"
+                            onClick={() =>
+                              setContentSettings((current) => {
+                                const next = [...current.card_sections]
+                                next[sectionIndex] = {
+                                  ...next[sectionIndex],
+                                  cards: [...next[sectionIndex].cards, { label: '', description: '' }],
+                                }
+                                return { ...current, card_sections: next }
+                              })
+                            }
+                            className="inline-flex items-center gap-1 text-xs text-wine hover:text-rose"
+                          >
+                            <Plus size={12} /> Adicionar card
+                          </button>
+                        </div>
+
+                        {section.cards.length === 0 ? (
+                          <div className="border border-dashed border-moss/20 p-4 text-sm text-moss/50">
+                            Nenhum card nesta seção.
+                          </div>
+                        ) : (
+                          <div className="space-y-3">
+                            {section.cards.map((card, cardIndex) => (
+                              <div key={cardIndex} className="grid grid-cols-1 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)_auto] gap-3 lg:gap-4 items-start border border-moss/10 p-3">
+                                <div>
+                                  <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Label</label>
+                                  <input
+                                    type="text"
+                                    value={card.label}
+                                    onChange={(e) =>
+                                      setContentSettings((current) => {
+                                        const next = [...current.card_sections]
+                                        const nextCards = [...next[sectionIndex].cards]
+                                        nextCards[cardIndex] = { ...nextCards[cardIndex], label: e.target.value }
+                                        next[sectionIndex] = { ...next[sectionIndex], cards: nextCards }
+                                        return { ...current, card_sections: next }
+                                      })
+                                    }
+                                    className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine"
+                                    placeholder="Estratégia passiva"
+                                  />
+                                </div>
+                                <div>
+                                  <label className="block text-xs tracking-widest uppercase text-moss/50 mb-2">Descrição</label>
+                                  <textarea
+                                    rows={2}
+                                    value={card.description}
+                                    onChange={(e) =>
+                                      setContentSettings((current) => {
+                                        const next = [...current.card_sections]
+                                        const nextCards = [...next[sectionIndex].cards]
+                                        nextCards[cardIndex] = { ...nextCards[cardIndex], description: e.target.value }
+                                        next[sectionIndex] = { ...next[sectionIndex], cards: nextCards }
+                                        return { ...current, card_sections: next }
+                                      })
+                                    }
+                                    className="w-full border border-moss/20 px-4 py-3 text-moss focus:outline-none focus:border-wine resize-none"
+                                    placeholder="Ventilação cruzada, iluminação natural..."
+                                  />
+                                </div>
+                                <button
+                                  type="button"
+                                  onClick={() =>
+                                    setContentSettings((current) => {
+                                      const next = [...current.card_sections]
+                                      next[sectionIndex] = {
+                                        ...next[sectionIndex],
+                                        cards: next[sectionIndex].cards.filter((_, i) => i !== cardIndex),
+                                      }
+                                      return { ...current, card_sections: next }
+                                    })
+                                  }
+                                  className="text-xs text-rose/80 hover:text-rose lg:self-end lg:mb-1"
+                                >
+                                  Remover card
+                                </button>
+                              </div>
+                            ))}
+                          </div>
+                        )}
+
+                        <button
+                          type="button"
+                          onClick={() =>
+                            setContentSettings((current) => ({
+                              ...current,
+                              card_sections: current.card_sections.filter((_, i) => i !== sectionIndex),
+                            }))
+                          }
+                          className="text-xs text-rose/80 hover:text-rose"
+                        >
+                          Remover seção
+                        </button>
+                      </div>
+                    ))}
+                  </div>
+                )}
               </div>
 
               <div className="border-t border-moss/15 pt-5">

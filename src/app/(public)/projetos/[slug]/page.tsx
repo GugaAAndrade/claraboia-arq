@@ -28,6 +28,16 @@ interface ProjectDetailField {
   value: string
 }
 
+interface ProjectSustainabilityCard {
+  label?: string
+  description?: string
+}
+
+interface ProjectCardSection {
+  title?: string
+  cards?: ProjectSustainabilityCard[]
+}
+
 interface ProjectContentSettings {
   custom_typology?: string
   details_title?: string
@@ -35,8 +45,7 @@ interface ProjectContentSettings {
   logo_url?: string
   explanation_title?: string
   explanation_text?: string
-  sustainability_title?: string
-  sustainability_text?: string
+  card_sections?: ProjectCardSection[]
   detail_fields?: ProjectDetailField[]
   technical_fields?: ProjectDetailField[]
   action_buttons?: { label?: string; url?: string }[]
@@ -151,8 +160,47 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
     : []
   const explanationTitle = projectContent.explanation_title?.trim() || 'Explicação do projeto'
   const explanationText = projectContent.explanation_text?.trim() || ''
-  const sustainabilityTitle = projectContent.sustainability_title?.trim() || 'Sustentabilidade'
-  const sustainabilityText = projectContent.sustainability_text?.trim() || ''
+  const legacySustainabilityTitle =
+    typeof (projectContent as { sustainability_title?: unknown }).sustainability_title === 'string'
+      ? ((projectContent as { sustainability_title?: string }).sustainability_title || '').trim()
+      : 'Sustentabilidade'
+  const legacySustainabilityText =
+    typeof (projectContent as { sustainability_text?: unknown }).sustainability_text === 'string'
+      ? ((projectContent as { sustainability_text?: string }).sustainability_text || '').trim()
+      : ''
+  const genericCardSections = Array.isArray(projectContent.card_sections)
+    ? projectContent.card_sections
+      .map((section) => ({
+        title: section?.title?.trim() || '',
+        cards: Array.isArray(section?.cards)
+          ? section.cards
+            .map((card) => ({
+              label: card?.label?.trim() || '',
+              description: card?.description?.trim() || '',
+            }))
+            .filter((card) => card.label || card.description)
+          : [],
+      }))
+      .filter((section) => section.title || section.cards.length > 0)
+    : []
+  const sectionsFromLegacySustainability =
+    genericCardSections.length > 0
+      ? genericCardSections
+      : (
+        Array.isArray((projectContent as { sustainability_cards?: ProjectSustainabilityCard[] }).sustainability_cards)
+          ? [{
+            title: legacySustainabilityTitle || 'Sustentabilidade',
+            cards: ((projectContent as { sustainability_cards?: ProjectSustainabilityCard[] }).sustainability_cards || [])
+              .map((card) => ({
+                label: card?.label?.trim() || '',
+                description: card?.description?.trim() || '',
+              }))
+              .filter((card) => card.label || card.description),
+          }].filter((section) => section.cards.length > 0)
+          : (legacySustainabilityText
+            ? [{ title: legacySustainabilityTitle || 'Sustentabilidade', cards: [{ label: '', description: legacySustainabilityText }] }]
+            : [])
+      )
   const customTypology = projectContent.custom_typology?.trim() || ''
   const detailsTitle = projectContent.details_title?.trim() || 'Detalhes'
   const technicalTitle = projectContent.technical_title?.trim() || 'Ficha técnica'
@@ -182,12 +230,6 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
       }))
       .filter((button) => button.label && button.url)
     : []
-
-  const descriptionBlocks = (project.description || '')
-    .split(/\n\s*\n/)
-    .map((block: string) => block.trim())
-    .filter(Boolean)
-  const [leadText, ...detailParagraphs] = descriptionBlocks
 
   const { data: mainArchitect } = project.architect_id
     ? await supabase.from('architects').select('*').eq('id', project.architect_id).maybeSingle()
@@ -271,17 +313,6 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                 <>
                   <p className="font-serif text-2xl md:text-3xl text-moss leading-[1.35] mb-7">{explanationText}</p>
                 </>
-              ) : leadText ? (
-                <>
-                  <p className="font-serif text-2xl md:text-3xl text-moss leading-[1.35] mb-7">{leadText}</p>
-                  <div className="space-y-5">
-                    {detailParagraphs.map((paragraph: string, index: number) => (
-                      <p key={index} className="text-moss/75 text-[16px] leading-[1.9]">
-                        {paragraph}
-                      </p>
-                    ))}
-                  </div>
-                </>
               ) : (
                 <p className="text-moss/60 text-lg leading-relaxed">
                   Em breve adicionaremos uma narrativa completa deste projeto.
@@ -289,10 +320,32 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
               )}
             </div>
 
-            {sustainabilityText && (
-              <div className="mb-14 border-l-2 border-gold pl-6">
-                <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-4">{sustainabilityTitle}</p>
-                <p className="text-moss/75 text-[16px] leading-[1.9]">{sustainabilityText}</p>
+            {sectionsFromLegacySustainability.length > 0 && (
+              <div className="space-y-10 mb-14">
+                {sectionsFromLegacySustainability.map((section, sectionIndex) => (
+                  <div key={`${section.title}-${sectionIndex}`}>
+                    {section.title && (
+                      <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{section.title}</p>
+                    )}
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
+                      {section.cards.map((card, index) => (
+                        <div
+                          key={`${card.label}-${index}`}
+                          className="border border-moss/15 bg-moss/6 px-5 py-4 transition-colors hover:bg-moss/10"
+                        >
+                          {card.label && (
+                            <p className="font-sans text-[10px] font-bold tracking-[0.25em] uppercase text-gold mb-2">
+                              {card.label}
+                            </p>
+                          )}
+                          {card.description && (
+                            <p className="text-moss/80 text-[14px] leading-[1.7]">{card.description}</p>
+                          )}
+                        </div>
+                      ))}
+                    </div>
+                  </div>
+                ))}
               </div>
             )}
 
