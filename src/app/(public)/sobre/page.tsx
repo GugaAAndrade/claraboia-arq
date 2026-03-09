@@ -1,9 +1,9 @@
+import { ArchitectsGrid } from '@/components/public/ArchitectsGrid'
 import { createClient } from '@/lib/supabase/server'
 import { Architect } from '@/types'
 import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
-import { ArchitectsGrid } from '@/components/public/ArchitectsGrid'
 
 export const metadata = {
   title: 'Sobre',
@@ -39,17 +39,13 @@ export default async function SobrePage() {
             <p className="font-serif text-[20px] tracking-[0.35em] uppercase text-cream mb-4">Nossa origem</p>
             <div className="border-l border-cream/25 pl-6 space-y-4 font-sans text-[14px] leading-[1.85] text-cream/75">
               <p>
-                O nome Claraboia vem do elemento arquitetônico que permite a entrada de luz natural pelos tetos
-                e coberturas, iluminando os ambientes de forma suave e valorizando os espaços.
+                O nome Claraboia vem de um elemento da arquitetura que permite a entrada de luz natural nos espaços, trazendo iluminação, conforto e valorizando os ambientes.
+                Para nós, ele simboliza a ideia de clareza, sensibilidade e novos olhares sobre a arquitetura e sobre os espaços.
               </p>
               <p>
-                Na arquitetura, a luz natural é essencial para criar conforto, destacar materiais e transformar
-                a experiência de quem vive o ambiente.
+                O escritório nasceu da união de seis amigas que, ao longo da formação em arquitetura, compartilham experiências, aprendizados e o desejo de construir algo juntas.
               </p>
-              <p>
-                O escritório nasceu da união de seis amigas que, ao longo da formação em arquitetura, compartilharam
-                experiências, aprendizados e o desejo de construir algo juntas.
-              </p>
+
             </div>
           </div>
 
@@ -96,7 +92,7 @@ export default async function SobrePage() {
             </div>
           </div>
           <div className="lg:col-span-5">
-            
+
           </div>
         </div>
       </section>
