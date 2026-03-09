@@ -1,8 +1,9 @@
 import { createClient } from '@/lib/supabase/server'
 import { Architect } from '@/types'
-import { ArrowRight, Instagram } from 'lucide-react'
+import { ArrowRight } from 'lucide-react'
 import Image from 'next/image'
 import Link from 'next/link'
+import { ArchitectsGrid } from '@/components/public/ArchitectsGrid'
 
 export const metadata = {
   title: 'Sobre',
@@ -189,50 +190,7 @@ export default async function SobrePage() {
               <p className="text-[16px] tracking-[0.35em] uppercase text-moss/60">A equipe</p>
             </div>
 
-            <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
-              {(architects as Architect[]).map((arch) => (
-                <div key={arch.id} className="group bg-white border border-wine/10 overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                  {/* Foto */}
-                  <div className="aspect-[3/4] relative overflow-hidden bg-cream/35">
-                    {arch.photo_url ? (
-                      <Image
-                        src={arch.photo_url}
-                        alt={arch.name}
-                        fill
-                        className="object-cover group-hover:scale-105 transition-transform duration-700"
-                      />
-                    ) : (
-                      <div className="absolute inset-0 flex items-center justify-center bg-cream/35">
-                        <span className="font-serif text-8xl text-gold/45">{arch.name.charAt(0)}</span>
-                      </div>
-                    )}
-                  </div>
-
-                  {/* Info */}
-                  <div className="p-8">
-                    {arch.specialty && (
-                      <p className="text-[10px] tracking-[0.3em] uppercase text-wine mb-2">{arch.specialty}</p>
-                    )}
-                    <h3 className="font-serif text-2xl text-charcoal mb-3">{arch.name}</h3>
-                    <div className="w-6 h-px bg-gold/55 mb-4" />
-                    {arch.bio && (
-                      <p className="text-moss/75 text-sm leading-relaxed mb-5 line-clamp-3">{arch.bio}</p>
-                    )}
-                    {arch.instagram && (
-                      <a
-                        href={`https://instagram.com/${arch.instagram.replace('@', '')}`}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] uppercase text-wine hover:text-rose transition-colors"
-                      >
-                        <Instagram size={12} />
-                        {arch.instagram}
-                      </a>
-                    )}
-                  </div>
-                </div>
-              ))}
-            </div>
+            <ArchitectsGrid architects={architects as Architect[]} />
           </div>
         </section>
       )}

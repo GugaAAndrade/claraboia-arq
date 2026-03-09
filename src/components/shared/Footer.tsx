@@ -93,9 +93,14 @@ export function Footer() {
 
         {/* Bottom */}
         <div className="border-t border-cream/10 pt-8 flex flex-col md:flex-row items-center justify-between gap-4">
-          <p className="font-sans text-[10px] font-light text-cream/35 tracking-widest">
-            © {new Date().getFullYear()} Claraboia Arquitetura. Todos os direitos reservados.
-          </p>
+          <div className="text-center md:text-left">
+            <p className="font-sans text-[10px] font-light text-cream/35 tracking-widest">
+              © {new Date().getFullYear()} Claraboia Arquitetura. Todos os direitos reservados.
+            </p>
+            <p className="inline-flex items-center mt-2 px-2.5 py-1 border border-gold/35 bg-gold/10 font-sans text-[10px] font-medium text-gold tracking-[0.18em] uppercase">
+              Site acadêmico criado para a disciplina de projeto sustentável.
+            </p>
+          </div>
           <Link
             href="/admin"
             className="font-sans text-[10px] font-light text-cream/30 hover:text-cream/70 transition-colors tracking-widest cursor-pointer"
