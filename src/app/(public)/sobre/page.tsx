@@ -37,7 +37,7 @@ export default async function SobrePage() {
         <div className="max-w-7xl mx-auto px-6 lg:px-12 grid grid-cols-1 lg:grid-cols-2 gap-14 lg:gap-16 items-center">
           <div>
             <p className="font-serif text-[20px] tracking-[0.35em] uppercase text-cream mb-4">Nossa origem</p>
-            <div className="border-l border-cream/25 pl-6 space-y-4 font-sans text-[14px] leading-[1.85] text-cream/75 text-justify">
+            <div className="border-l border-cream/25 pl-6 space-y-4 font-sans text-[14px] leading-[1.85] text-cream/75 md:text-justify">
               <p>
                 O nome Claraboia vem de um elemento da arquitetura que permite a entrada de luz natural nos espaços, trazendo iluminação, conforto e valorizando os ambientes.
                 Para nós, ele simboliza a ideia de clareza, sensibilidade e novos olhares sobre a arquitetura e sobre os espaços.
@@ -56,9 +56,9 @@ export default async function SobrePage() {
                   src={aboutTeamPhotoUrl}
                   alt="Equipe Claraboia"
                   fill
-                  loading="eager"
-                  sizes="(max-width: 1024px) 100vw, 50vw"
-                  quality={72}
+                  sizes="(max-width: 1024px) 92vw, 50vw"
+                  quality={60}
+                  decoding="async"
                   className="object-cover"
                 />
               ) : (
@@ -80,7 +80,7 @@ export default async function SobrePage() {
             <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08] mb-8">
               Acreditamos que a arquitetura deve iluminar os espaços, as relações e a forma como vivemos.
             </h2>
-            <div className="space-y-4 font-sans text-[14px] leading-[1.9] text-moss/75 text-justify">
+            <div className="space-y-4 font-sans text-[14px] leading-[1.9] text-moss/75 md:text-justify">
               <p>
                 Somos seis mulheres criativas que enxergam a arquitetura como ferramenta de transformação urbana,
                 ambiental e cotidiana. Inspiradas pela arquitetura moderna e contemporânea, projetamos com linhas
@@ -110,8 +110,9 @@ export default async function SobrePage() {
                   src={aboutIdentityVisualImageUrl}
                   alt="Claraboia Arquitetura"
                   fill
-                  sizes="(max-width: 1024px) 100vw, 42vw"
-                  quality={70}
+                  sizes="(max-width: 1024px) 92vw, 42vw"
+                  quality={58}
+                  decoding="async"
                   className="object-cover"
                 />
               ) : (
@@ -126,7 +127,7 @@ export default async function SobrePage() {
             <h2 className="font-serif text-[34px] md:text-[44px] text-charcoal leading-[1.08] mb-8">
               A marca como extensão da filosofia projetual
             </h2>
-            <div className="space-y-4 font-sans text-[14px] leading-[1.9] text-moss/75 text-justify">
+            <div className="space-y-4 font-sans text-[14px] leading-[1.9] text-moss/75 md:text-justify">
               <p>
                 A identidade visual da Claraboia Arquitetura foi desenhada para refletir a luz como elemento central
                 que transforma os espaços.
@@ -174,7 +175,7 @@ export default async function SobrePage() {
               <div key={v.num} className="border-t-2 border-wine pt-6">
                 <p className="font-serif text-4xl text-gold/65 mb-4 select-none">{v.num}</p>
                 <h3 className="font-serif text-[30px] leading-none text-charcoal">{v.title}</h3>
-                <p className="font-sans text-[14px] leading-[1.85] text-moss/75 mt-4 text-justify">{v.text}</p>
+                <p className="font-sans text-[14px] leading-[1.85] text-moss/75 mt-4 md:text-justify">{v.text}</p>
               </div>
             ))}
           </div>
@@ -208,7 +209,7 @@ export default async function SobrePage() {
             </h2>
           </div>
           <div className="lg:text-right">
-            <p className="text-moss/75 mb-8 max-w-sm leading-relaxed text-sm text-justify">
+            <p className="text-moss/75 mb-8 max-w-sm leading-relaxed text-sm md:text-justify">
               Conte-nos sobre o seu espaço e transformamos sua ideia em realidade.
             </p>
             <Link

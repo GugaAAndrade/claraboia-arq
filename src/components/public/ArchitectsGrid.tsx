@@ -45,9 +45,11 @@ export function ArchitectsGrid({ architects }: ArchitectsGridProps) {
                   src={arch.photo_url}
                   alt={arch.name}
                   fill
-                  sizes="(max-width: 768px) 100vw, (max-width: 1200px) 50vw, 33vw"
-                  quality={68}
-                  className="object-cover group-hover:scale-105 transition-transform duration-700"
+                  loading="lazy"
+                  sizes="(max-width: 768px) 92vw, (max-width: 1200px) 46vw, 31vw"
+                  quality={45}
+                  decoding="async"
+                  className="object-cover md:group-hover:scale-105 transition-transform duration-700"
                 />
               ) : (
                 <div className="absolute inset-0 flex items-center justify-center bg-cream/35">
@@ -81,14 +83,14 @@ export function ArchitectsGrid({ architects }: ArchitectsGridProps) {
 
       {selectedArchitect && (
         <div
-          className="fixed inset-0 z-[80] bg-black/55 backdrop-blur-[2px] flex items-center justify-center p-4 md:p-6"
+          className="fixed inset-0 z-[80] bg-black/55 md:backdrop-blur-[2px] flex items-center justify-center p-4 md:p-6"
           onClick={() => setSelectedArchitect(null)}
         >
           <div
             role="dialog"
             aria-modal="true"
             aria-labelledby={modalTitleId}
-            className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#FFFDF8] border border-wine/15 shadow-[0_28px_70px_rgba(0,0,0,0.28)]"
+            className="w-full max-w-4xl max-h-[90vh] overflow-y-auto bg-[#FFFDF8] border border-wine/15 md:shadow-[0_28px_70px_rgba(0,0,0,0.28)]"
             onClick={(event) => event.stopPropagation()}
           >
             <div className="flex items-center justify-between p-3 md:px-4 md:sticky md:top-0 md:z-10 bg-[#FFFDF8]/95 border-b border-wine/10">
@@ -111,7 +113,8 @@ export function ArchitectsGrid({ architects }: ArchitectsGridProps) {
                     alt={selectedArchitect.name}
                     fill
                     sizes="(max-width: 768px) 100vw, 50vw"
-                    quality={72}
+                    quality={60}
+                    decoding="async"
                     className="object-cover object-top md:object-center"
                   />
                 ) : (
