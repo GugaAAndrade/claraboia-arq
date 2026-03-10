@@ -56,7 +56,9 @@ export default async function SobrePage() {
                   src={aboutTeamPhotoUrl}
                   alt="Equipe Claraboia"
                   fill
-                  priority
+                  loading="eager"
+                  sizes="(max-width: 1024px) 100vw, 50vw"
+                  quality={72}
                   className="object-cover"
                 />
               ) : (
@@ -108,6 +110,8 @@ export default async function SobrePage() {
                   src={aboutIdentityVisualImageUrl}
                   alt="Claraboia Arquitetura"
                   fill
+                  sizes="(max-width: 1024px) 100vw, 42vw"
+                  quality={70}
                   className="object-cover"
                 />
               ) : (

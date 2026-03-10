@@ -7,6 +7,7 @@ const forum = Forum({
   weight: ['400'],
   variable: '--font-forum',
   display: 'swap',
+  preload: false,
 })
 
 const montserrat = Montserrat({
@@ -14,6 +15,7 @@ const montserrat = Montserrat({
   weight: ['100', '200', '300', '400'],
   variable: '--font-montserrat',
   display: 'swap',
+  preload: false,
 })
 
 export const metadata: Metadata = {
@@ -27,6 +29,11 @@ export const metadata: Metadata = {
     siteName: 'Claraboia Arquitetura',
     type: 'website',
     locale: 'pt_BR',
+  },
+  icons: {
+    icon: '/brand/logo-burgundy.png',
+    shortcut: '/brand/logo-burgundy.png',
+    apple: '/brand/logo-burgundy.png',
   },
 }
 
