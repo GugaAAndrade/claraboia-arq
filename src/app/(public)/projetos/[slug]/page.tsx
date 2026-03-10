@@ -160,6 +160,11 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
     : []
   const explanationTitle = projectContent.explanation_title?.trim() || 'Explicação do projeto'
   const explanationText = projectContent.explanation_text?.trim() || ''
+  const explanationBlocks = explanationText
+    .split(/\n\s*\n/)
+    .map((block) => block.trim())
+    .filter(Boolean)
+  const [explanationLead, ...explanationDetails] = explanationBlocks
   const legacySustainabilityTitle =
     typeof (projectContent as { sustainability_title?: unknown }).sustainability_title === 'string'
       ? ((projectContent as { sustainability_title?: string }).sustainability_title || '').trim()
@@ -310,11 +315,26 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
             <div className="mb-12">
               <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{explanationTitle}</p>
               {explanationText ? (
-                <>
-                  <p className="font-serif text-2xl md:text-3xl text-moss leading-[1.35] mb-7">{explanationText}</p>
-                </>
+                explanationBlocks.length > 1 ? (
+                  <>
+                    <p className="font-serif text-2xl md:text-3xl text-moss leading-[1.35] mb-7 text-justify">
+                      {explanationLead}
+                    </p>
+                    <div className="space-y-5">
+                      {explanationDetails.map((paragraph, index) => (
+                        <p key={index} className="text-moss/75 text-[16px] leading-[1.9] text-justify">
+                          {paragraph}
+                        </p>
+                      ))}
+                    </div>
+                  </>
+                ) : (
+                  <p className="font-serif text-2xl md:text-3xl text-moss leading-[1.35] mb-7 text-justify">
+                    {explanationText}
+                  </p>
+                )
               ) : (
-                <p className="text-moss/60 text-lg leading-relaxed">
+                <p className="text-moss/60 text-lg leading-relaxed text-justify">
                   Em breve adicionaremos uma narrativa completa deste projeto.
                 </p>
               )}
@@ -339,7 +359,7 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                             </p>
                           )}
                           {card.description && (
-                            <p className="text-moss/80 text-[14px] leading-[1.7]">{card.description}</p>
+                            <p className="text-moss/80 text-[14px] leading-[1.7] text-justify">{card.description}</p>
                           )}
                         </div>
                       ))}
@@ -373,7 +393,7 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                       <p className="text-[10px] tracking-[0.35em] uppercase text-wine/70 mb-5">{section.name}</p>
                     )}
                     {section.text && (
-                      <p className="text-moss/70 text-[15px] leading-[1.85] mb-5">{section.text}</p>
+                      <p className="text-moss/70 text-[15px] leading-[1.85] mb-5 text-justify">{section.text}</p>
                     )}
                     {section.images.length > 0 && (
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
@@ -426,7 +446,7 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                     {detailFields.map((field, index) => (
                       <div key={`${field.label}-${index}`}>
                         <p className="text-moss/45 uppercase tracking-wider text-[10px]">{field.label}</p>
-                        <p className="text-moss">{field.value}</p>
+                        <p className="text-moss text-justify">{field.value}</p>
                       </div>
                     ))}
                   </div>
@@ -448,7 +468,7 @@ export default async function ProjetoPage({ params }: { params: Promise<{ slug: 
                     {customTechnicalFields.map((field, index) => (
                       <div key={`${field.label}-${index}`}>
                         <p className="text-moss/45 uppercase tracking-wider text-[10px]">{field.label}</p>
-                        <p className="text-moss">{field.value}</p>
+                        <p className="text-moss text-justify">{field.value}</p>
                       </div>
                     ))}
                   </div>

@@ -61,7 +61,7 @@ export function ArchitectsGrid({ architects }: ArchitectsGridProps) {
               <h3 className="font-serif text-2xl text-charcoal mb-3">{arch.name}</h3>
               <div className="w-6 h-px bg-gold/55 mb-4" />
               {arch.bio && (
-                <p className="text-moss/75 text-sm leading-relaxed mb-5 line-clamp-3">{arch.bio}</p>
+                <p className="text-moss/75 text-sm leading-relaxed mb-5 line-clamp-3 text-justify">{arch.bio}</p>
               )}
               {arch.instagram && (
                 <span className="inline-flex items-center gap-2 text-[11px] font-medium tracking-[0.2em] uppercase text-wine">
@@ -126,7 +126,7 @@ export function ArchitectsGrid({ architects }: ArchitectsGridProps) {
                 </h3>
                 <div className="w-10 h-px bg-gold/55 mb-6" />
                 {selectedArchitect.bio ? (
-                  <p className="text-moss/80 text-[15px] leading-[1.95] whitespace-pre-line">{selectedArchitect.bio}</p>
+                  <p className="text-moss/80 text-[15px] leading-[1.95] whitespace-pre-line text-justify">{selectedArchitect.bio}</p>
                 ) : (
                   <p className="text-moss/60 text-sm">Resumo não informado.</p>
                 )}
