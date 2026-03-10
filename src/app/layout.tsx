@@ -1,6 +1,7 @@
 import type { Metadata } from 'next'
 import './globals.css'
 import { Forum, Montserrat } from 'next/font/google'
+import { Analytics } from '@vercel/analytics/next'
 
 const forum = Forum({
   subsets: ['latin'],
@@ -44,7 +45,10 @@ export default function RootLayout({
 }) {
   return (
     <html lang="pt-BR" className={`${forum.variable} ${montserrat.variable}`}>
-      <body className="min-h-screen">{children}</body>
+      <body className="min-h-screen">
+        {children}
+        <Analytics />
+      </body>
     </html>
   )
 }
